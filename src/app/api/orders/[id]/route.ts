@@ -28,7 +28,7 @@ export async function GET(
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    if (user.role !== "admin" && order.userId !== user.id) {
+    if (user.role !== "admin" && order.userId !== user.id && order.customerEmail !== user.email) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

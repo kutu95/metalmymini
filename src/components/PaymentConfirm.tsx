@@ -37,12 +37,12 @@ export function PaymentConfirm() {
   return (
     <Card>
       <StatusBadge label="Awaiting payment" />
-      <h1 className="mt-4 text-2xl font-semibold text-stone-100">Complete your commission</h1>
+      <h1 className="mt-4 text-2xl font-semibold text-stone-100">Complete your order</h1>
       <p className="mt-3 text-stone-400">
-        Commission <strong className="text-stone-200">{orderNumber}</strong> is ready for payment.
+        Order <strong className="text-stone-200">{orderNumber}</strong> is ready for payment.
       </p>
       <p className="mt-2 text-sm text-stone-500">
-        Once paid, I&apos;ll review your file and get in touch if anything needs attention before I start.
+        After payment, your file will be reviewed and you will be contacted if anything needs attention before production.
       </p>
 
       <div className="mt-6 flex flex-wrap gap-3">

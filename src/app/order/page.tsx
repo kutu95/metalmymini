@@ -5,8 +5,8 @@ export default function OrderPage() {
   return (
     <div>
       <PageHeading
-        title="Commission Your Mini"
-        subtitle="Send me your model, choose a copper finish, and submit your commission. I review every file personally before production begins."
+        title="Upload Your Mini"
+        subtitle="Upload your model, choose a copper finish, and submit your order. Each file is reviewed before production begins."
       />
       <OrderForm />
     </div>

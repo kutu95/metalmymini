@@ -49,7 +49,7 @@ export function OrderForm() {
       <div className="space-y-6">
         <Card>
           <h2 className="text-lg font-medium text-stone-100">Your model file</h2>
-          <FormField label="Send your STL, OBJ, or 3MF" hint="Up to 100 mm in any dimension. I'll review it before printing.">
+          <FormField label="Upload STL, OBJ, or 3MF" hint="Up to 100 mm in any dimension. Reviewed before production.">
             <input
               name="modelFile"
               type="file"
@@ -181,10 +181,10 @@ export function OrderForm() {
           </div>
           {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
           <Button type="submit" disabled={loading} className="mt-6 w-full">
-            {loading ? "Sending..." : "Submit Commission"}
+            {loading ? "Submitting..." : "Submit Order"}
           </Button>
           <p className="mt-4 text-xs text-stone-500">
-            Payment is taken on submission. I&apos;ll review your file and be in touch if anything needs attention.
+            Payment is taken on submission. Your file will be reviewed and you will be contacted if anything needs attention.
           </p>
         </Card>
       </div>

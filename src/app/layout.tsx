@@ -16,9 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Metal My Mini — Shay's Copper Miniature Workshop",
+  title: "Metal My Mini — Premium Copper-Plated Miniatures",
   description:
-    "Commission custom copper-plated tabletop miniatures from Shay — tabletop gamer, resin printer, and plating specialist. Every piece reviewed and finished by hand.",
+    "Specialist copper-plated tabletop miniatures from your 3D model files. Expert review, premium finishes, worldwide shipping.",
 };
 
 export default async function RootLayout({

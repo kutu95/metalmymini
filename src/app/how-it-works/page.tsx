@@ -5,61 +5,48 @@ export default function HowItWorksPage() {
   return (
     <div>
       <PageHeading
-        title="How I Work"
-        subtitle="Metal My Mini is my workshop — not a print farm. I review every file myself before anything goes to the printer."
+        title="How It Works"
+        subtitle="Metal My Mini is a specialist copper plating service for custom tabletop miniatures. Every file is reviewed before production begins."
       />
 
       <div className="grid gap-6">
-        <Card className="workshop-card">
-          <h2 className="text-xl font-medium text-stone-100">1. You send your model and pay</h2>
+        <Card>
+          <h2 className="text-xl font-medium text-stone-100">1. Upload and pay</h2>
           <p className="mt-3 leading-relaxed text-stone-400">
-            Pick your finish, upload your file, add your shipping details, and submit your commission.
-            Payment is taken when you order. I use secure checkout — you&apos;ll get a confirmation
-            straight away.
+            Choose your finish, upload your model, enter shipping details, and submit your order.
+            Payment is taken at submission through secure checkout.
           </p>
         </Card>
 
-        <Card className="workshop-card">
-          <h2 className="text-xl font-medium text-stone-100">2. I review your file by hand</h2>
+        <Card>
+          <h2 className="text-xl font-medium text-stone-100">2. Expert file review</h2>
           <p className="mt-3 leading-relaxed text-stone-400">
-            After payment, I personally check your model — printability, size, and whether it will
-            plate well. I accept {ACCEPTED_FILE_TYPES.join(", ")} files up to{" "}
+            After payment, each file is reviewed for printability, size, and suitability for copper
+            plating. Accepted formats: {ACCEPTED_FILE_TYPES.join(", ")}. Maximum size:{" "}
             {MAX_MODEL_DIMENSION_MM} mm in any dimension.
           </p>
         </Card>
 
-        <Card className="workshop-card">
-          <h2 className="text-xl font-medium text-stone-100">3. What can happen next</h2>
+        <Card>
+          <h2 className="text-xl font-medium text-stone-100">3. Review outcomes</h2>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-stone-400">
-            <li>
-              <strong className="text-stone-200">Approved</strong> — I start printing and plating.
-            </li>
-            <li>
-              <strong className="text-stone-200">I need more info</strong> — I&apos;ll email you with
-              a question.
-            </li>
-            <li>
-              <strong className="text-stone-200">Extra work required</strong> — unusual models may
-              need additional payment; I&apos;ll explain why.
-            </li>
-            <li>
-              <strong className="text-stone-200">Can&apos;t be made</strong> — if the file
-              won&apos;t work and we can&apos;t fix it, I&apos;ll refund you.
-            </li>
+            <li><strong className="text-stone-200">Approved</strong> — production begins.</li>
+            <li><strong className="text-stone-200">More information needed</strong> — you will be contacted for clarification.</li>
+            <li><strong className="text-stone-200">Extra charge required</strong> — unusual models may require additional payment.</li>
+            <li><strong className="text-stone-200">Rejected and refunded</strong> — if the file cannot reasonably be produced.</li>
           </ul>
         </Card>
 
-        <Card className="workshop-card">
-          <h2 className="text-xl font-medium text-stone-100">4. Print, plate, pack, ship</h2>
+        <Card>
+          <h2 className="text-xl font-medium text-stone-100">4. Production and shipping</h2>
           <p className="mt-3 leading-relaxed text-stone-400">
-            Approved commissions go through my usual bench process: resin print, copper plate, polish,
-            and careful packing. Shipping is at your cost, worldwide. When your parcel goes out, I add
-            the tracking number to your order.
+            Approved orders are printed in UV resin, copper plated, polished, and packaged.
+            Shipping is at customer cost, worldwide. Tracking is added when your order ships.
           </p>
         </Card>
 
-        <Card className="workshop-card">
-          <h2 className="text-xl font-medium text-stone-100">A note before you order</h2>
+        <Card>
+          <h2 className="text-xl font-medium text-stone-100">Order terms</h2>
           <ul className="mt-3 space-y-3 text-sm leading-relaxed text-stone-400">
             <li>{LEGAL_CHECKOUT_TEXT.review}</li>
             <li>{LEGAL_CHECKOUT_TEXT.gallery}</li>

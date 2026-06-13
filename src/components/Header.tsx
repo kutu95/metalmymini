@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 
 const links = [
   { href: "/", label: "Home" },
-  { href: "/how-it-works", label: "How I Work" },
+  { href: "/how-it-works", label: "How It Works" },
   { href: "/gallery", label: "Gallery" },
-  { href: "/order", label: "Commission" },
+  { href: "/order", label: "Order" },
   { href: "/order/status", label: "Track Order" },
 ];
 
@@ -97,7 +97,7 @@ export function Header({
                 href="/order"
                 className="rounded-md bg-copper px-4 py-2 text-sm font-medium text-black transition hover:bg-copper-light"
               >
-                Commission Your Mini
+                Upload Your Mini
               </Link>
             </>
           )}
@@ -173,7 +173,7 @@ export function Header({
                     onClick={closeMenu}
                     className="mt-2 inline-flex items-center justify-center rounded-md bg-copper px-4 py-3 text-sm font-medium text-black transition hover:bg-copper-light"
                   >
-                    Commission Your Mini
+                    Upload Your Mini
                   </Link>
                 </>
               )}

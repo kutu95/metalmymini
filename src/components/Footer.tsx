@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { FOUNDER } from "@/lib/constants";
+import Link from "next/link";
 
 export function Footer() {
   return (
@@ -8,13 +8,13 @@ export function Footer() {
         <div>
           <p className="font-medium text-stone-200">Metal My Mini</p>
           <p className="mt-2 max-w-sm text-sm leading-relaxed text-stone-500">
-            A small artisan workshop run by {FOUNDER.name}. Custom copper-plated tabletop
-            miniatures, finished by hand and shipped worldwide.
+            Specialist copper-plated tabletop miniatures. Operated by {FOUNDER.name} — premium
+            finishing with expert review on every order.
           </p>
         </div>
         <div className="flex flex-wrap gap-4 text-sm text-stone-400">
           <Link href="/how-it-works" className="hover:text-copper-light">
-            How I Work
+            How It Works
           </Link>
           <Link href="/order/status" className="hover:text-copper-light">
             Track Order
@@ -23,7 +23,7 @@ export function Footer() {
             Gallery
           </Link>
           <Link href="/order" className="hover:text-copper-light">
-            Commission
+            Order
           </Link>
         </div>
       </div>

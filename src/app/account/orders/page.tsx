@@ -79,7 +79,7 @@ export default function MyOrdersPage() {
           <Card>
             <p className="text-stone-400">No orders yet.</p>
             <Button href="/order" className="mt-4">
-              Commission Your Mini
+              Upload Your Mini
             </Button>
           </Card>
         )}

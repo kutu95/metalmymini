@@ -23,14 +23,14 @@ export function PhotoPlaceholder({
 }: PhotoPlaceholderProps) {
   return (
     <div
-      className={`workshop-frame overflow-hidden rounded-xl border border-copper/25 bg-stone-950 ${aspectClasses[aspect]} ${className}`}
+      className={`overflow-hidden rounded-xl border border-copper/20 bg-stone-950 ${aspectClasses[aspect]} ${className}`}
     >
-      <div className="flex h-full flex-col items-center justify-center bg-gradient-to-br from-stone-900/80 via-black to-stone-950 p-6 text-center">
-        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-dashed border-copper/40 bg-copper/5">
+      <div className="flex h-full flex-col items-center justify-center bg-gradient-to-br from-stone-900/60 to-black p-6 text-center">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-copper/30 bg-copper/5">
           <svg
-            className="text-copper/60"
-            width="24"
-            height="24"
+            className="text-copper/50"
+            width="22"
+            height="22"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -42,7 +42,7 @@ export function PhotoPlaceholder({
             <path d="M21 16l-5.5-5.5a2 2 0 0 0-2.8 0L3 18" />
           </svg>
         </div>
-        <p className="text-xs uppercase tracking-[0.2em] text-copper-light">{label}</p>
+        <p className="text-xs uppercase tracking-[0.15em] text-copper-light">{label}</p>
         {caption && <p className="mt-3 max-w-xs text-sm leading-relaxed text-stone-500">{caption}</p>}
         {children}
       </div>
@@ -60,7 +60,7 @@ export function TrustSignalGrid({
       {signals.map((signal) => (
         <div
           key={signal.title}
-          className="workshop-card rounded-xl border border-copper/15 bg-charcoal/80 p-5"
+          className="rounded-xl border border-copper/15 bg-charcoal p-5"
         >
           <p className="font-medium text-stone-100">{signal.title}</p>
           <p className="mt-2 text-sm leading-relaxed text-stone-400">{signal.detail}</p>

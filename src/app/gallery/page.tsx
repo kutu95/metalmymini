@@ -20,19 +20,17 @@ export default async function GalleryPage() {
     <div>
       <PageHeading
         title="Gallery"
-        subtitle="Photographs of minis I've finished at the bench — real work for real customers."
+        subtitle="Completed copper-plated miniatures from Metal My Mini customers."
       />
 
       {items.length === 0 ? (
-        <Card className="workshop-card">
-          <p className="text-stone-400">
-            I&apos;m building this gallery as I photograph completed pieces. Check back soon.
-          </p>
+        <Card>
+          <p className="text-stone-400">No gallery items published yet.</p>
         </Card>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => (
-            <Card key={item.id} className="workshop-card overflow-hidden p-0">
+            <Card key={item.id} className="overflow-hidden p-0">
               <img
                 src={`/api/files/gallery/${item.imagePath}`}
                 alt={item.title}
@@ -45,7 +43,7 @@ export default async function GalleryPage() {
                   <p className="mt-3 text-sm leading-relaxed text-stone-400">{item.description}</p>
                 )}
                 <p className="mt-4 text-xs uppercase tracking-wide text-stone-500">
-                  Finished {formatDate(item.createdAt)}
+                  Completed {formatDate(item.createdAt)}
                 </p>
               </div>
             </Card>
