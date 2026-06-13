@@ -48,8 +48,8 @@ export function OrderForm() {
     <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
       <div className="space-y-6">
         <Card>
-          <h2 className="text-lg font-medium text-stone-100">Model file</h2>
-          <FormField label="Upload STL, OBJ, or 3MF" hint="Maximum 100 mm in any dimension. Max file size configurable via env.">
+          <h2 className="text-lg font-medium text-stone-100">Your model file</h2>
+          <FormField label="Send your STL, OBJ, or 3MF" hint="Up to 100 mm in any dimension. I'll review it before printing.">
             <input
               name="modelFile"
               type="file"
@@ -181,10 +181,10 @@ export function OrderForm() {
           </div>
           {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
           <Button type="submit" disabled={loading} className="mt-6 w-full">
-            {loading ? "Submitting..." : "Submit Order"}
+            {loading ? "Sending..." : "Submit Commission"}
           </Button>
           <p className="mt-4 text-xs text-stone-500">
-            Stripe checkout will be connected here. Dev mode uses payment simulation on the next screen.
+            Payment is taken on submission. I&apos;ll review your file and be in touch if anything needs attention.
           </p>
         </Card>
       </div>

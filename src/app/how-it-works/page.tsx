@@ -5,50 +5,62 @@ export default function HowItWorksPage() {
   return (
     <div>
       <PageHeading
-        title="How It Works"
-        subtitle="Metal My Mini is a manufacturing service — not just a print farm. Every file is reviewed by hand before production begins."
+        title="How I Work"
+        subtitle="Metal My Mini is my workshop — not a print farm. I review every file myself before anything goes to the printer."
       />
 
       <div className="grid gap-6">
-        <Card>
-          <h2 className="text-xl font-medium text-stone-100">1. Upload and pay on submission</h2>
-          <p className="mt-3 text-stone-400">
-            Choose your finish, upload your model, enter shipping details, and submit your order.
-            Payment is taken at submission. Stripe checkout will handle live payments; development
-            mode includes a safe payment simulation.
+        <Card className="workshop-card">
+          <h2 className="text-xl font-medium text-stone-100">1. You send your model and pay</h2>
+          <p className="mt-3 leading-relaxed text-stone-400">
+            Pick your finish, upload your file, add your shipping details, and submit your commission.
+            Payment is taken when you order. I use secure checkout — you&apos;ll get a confirmation
+            straight away.
           </p>
         </Card>
 
-        <Card>
-          <h2 className="text-xl font-medium text-stone-100">2. Manual file review</h2>
-          <p className="mt-3 text-stone-400">
-            After payment, your file enters human review. We check printability, size limits, and
-            suitability for copper plating. Accepted file types: {ACCEPTED_FILE_TYPES.join(", ")}.
-            Maximum size: {MAX_MODEL_DIMENSION_MM} mm in any dimension.
+        <Card className="workshop-card">
+          <h2 className="text-xl font-medium text-stone-100">2. I review your file by hand</h2>
+          <p className="mt-3 leading-relaxed text-stone-400">
+            After payment, I personally check your model — printability, size, and whether it will
+            plate well. I accept {ACCEPTED_FILE_TYPES.join(", ")} files up to{" "}
+            {MAX_MODEL_DIMENSION_MM} mm in any dimension.
           </p>
         </Card>
 
-        <Card>
-          <h2 className="text-xl font-medium text-stone-100">3. Possible review outcomes</h2>
+        <Card className="workshop-card">
+          <h2 className="text-xl font-medium text-stone-100">3. What can happen next</h2>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-stone-400">
-            <li><strong className="text-stone-200">Approved</strong> — production begins.</li>
-            <li><strong className="text-stone-200">More information needed</strong> — we contact you for clarification.</li>
-            <li><strong className="text-stone-200">Extra charge required</strong> — unusual processing may need additional payment.</li>
-            <li><strong className="text-stone-200">Rejected and refunded</strong> — if the file cannot reasonably be produced.</li>
+            <li>
+              <strong className="text-stone-200">Approved</strong> — I start printing and plating.
+            </li>
+            <li>
+              <strong className="text-stone-200">I need more info</strong> — I&apos;ll email you with
+              a question.
+            </li>
+            <li>
+              <strong className="text-stone-200">Extra work required</strong> — unusual models may
+              need additional payment; I&apos;ll explain why.
+            </li>
+            <li>
+              <strong className="text-stone-200">Can&apos;t be made</strong> — if the file
+              won&apos;t work and we can&apos;t fix it, I&apos;ll refund you.
+            </li>
           </ul>
         </Card>
 
-        <Card>
-          <h2 className="text-xl font-medium text-stone-100">4. Production and shipping</h2>
-          <p className="mt-3 text-stone-400">
-            Approved orders move through print, plate, polish, and packaging. Shipping is paid by
-            the customer and sent worldwide. Tracking is added manually when your order ships.
+        <Card className="workshop-card">
+          <h2 className="text-xl font-medium text-stone-100">4. Print, plate, pack, ship</h2>
+          <p className="mt-3 leading-relaxed text-stone-400">
+            Approved commissions go through my usual bench process: resin print, copper plate, polish,
+            and careful packing. Shipping is at your cost, worldwide. When your parcel goes out, I add
+            the tracking number to your order.
           </p>
         </Card>
 
-        <Card>
-          <h2 className="text-xl font-medium text-stone-100">Customer commitments</h2>
-          <ul className="mt-3 space-y-3 text-sm text-stone-400">
+        <Card className="workshop-card">
+          <h2 className="text-xl font-medium text-stone-100">A note before you order</h2>
+          <ul className="mt-3 space-y-3 text-sm leading-relaxed text-stone-400">
             <li>{LEGAL_CHECKOUT_TEXT.review}</li>
             <li>{LEGAL_CHECKOUT_TEXT.gallery}</li>
             <li>{LEGAL_CHECKOUT_TEXT.contact}</li>
