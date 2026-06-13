@@ -36,7 +36,7 @@ export default async function HomePage() {
             Custom copper-plated miniatures
           </p>
           <h1 className="text-4xl font-semibold leading-tight text-stone-100 md:text-5xl">
-            Your custom miniature, finished in copper.
+            Custom miniatures with a premium copper-plated finish.
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-stone-400">
             Upload your STL, OBJ, or 3MF. We print in UV resin, apply specialist copper plating,
