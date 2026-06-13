@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["metal"]
+}
+
+enum Role {
+  customer
+  admin
+
+  @@schema("metal")
+}
+
+enum ProductOption {
+  cosmetic_copper
+  heavy_duty_copper
+
+  @@schema("metal")
+}
+
+enum PaymentStatus {
+  unpaid
+  paid
+  refunded
+  failed
+
+  @@schema("metal")
+}
+
+enum ProductionStatus {
+  submitted
+  paid
+  human_review
+  approved
+  printing
+  plating
+  polishing
+  packaging
+  shipped
+  completed
+  awaiting_customer_action
+  additional_payment_required
+  rejected
+  refunded
+  cancelled
+
+  @@schema("metal")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(customer)
+  createdAt    DateTime @default(now())
+  orders       Order[]
+
+  @@schema("metal")
+}
+
+model Order {
+  id                           String               @id @default(cuid())
+  orderNumber                  String               @unique
+  userId                       String?
+  user                         User?                @relation(fields: [userId], references: [id])
+  customerName                 String
+  customerEmail                String
+  shippingAddress              String
+  country                      String
+  productOption                ProductOption
+  quantity                     Int
+  unitPrice                    Int
+  totalPrice                   Int
+  shippingPrice                Int?
+  paymentStatus                PaymentStatus        @default(unpaid)
+  productionStatus             ProductionStatus     @default(submitted)
+  uploadedFileId               String               @unique
+  uploadedFile                 UploadedFile         @relation(fields: [uploadedFileId], references: [id])
+  termsAccepted                Boolean
+  publicGalleryConsentAccepted Boolean
+  adminNotes                   String?
+  customerNotes                String?
+  trackingNumber               String?
+  createdAt                    DateTime             @default(now())
+  updatedAt                    DateTime             @updatedAt
+  statusHistory                OrderStatusHistory[]
+  galleryItems                 GalleryItem[]
+
+  @@schema("metal")
+}
+
+model UploadedFile {
+  id               String   @id @default(cuid())
+  originalFilename String
+  storedFilename   String   @unique
+  fileType         String
+  fileSize         Int
+  filePath         String
+  uploadedAt       DateTime @default(now())
+  order            Order?
+
+  @@schema("metal")
+}
+
+model GalleryItem {
+  id             String        @id @default(cuid())
+  title          String
+  description    String?
+  finishType     ProductOption
+  imagePath      String
+  relatedOrderId String?
+  relatedOrder   Order?        @relation(fields: [relatedOrderId], references: [id])
+  published      Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+
+  @@schema("metal")
+}
+
+model OrderStatusHistory {
+  id        String           @id @default(cuid())
+  orderId   String
+  order     Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    ProductionStatus
+  note      String?
+  createdAt DateTime         @default(now())
+  createdBy String?
+
+  @@schema("metal")
+}
