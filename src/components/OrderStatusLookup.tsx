@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Card, StatusBadge } from "@/components/ui";
+import { OrderTrackingView, type OrderTrackingData } from "@/components/OrderTrackingView";
 import { PAYMENT_STATUS_LABELS, PRODUCTION_STATUS_LABELS } from "@/lib/constants";
 import { formatAud, formatDateTime, productLabel } from "@/lib/format";
 
@@ -18,123 +19,97 @@ type OrderSummary = {
   createdAt: string;
 };
 
-type OrderDetail = OrderSummary & {
-  trackingNumber?: string | null;
-  customerNotes?: string | null;
-  statusHistory?: Array<{ status: string; note?: string | null; createdAt: string }>;
+type OrderStatusLookupProps = {
+  isLoggedIn: boolean;
 };
 
-function OrderDetailCard({ order }: { order: OrderDetail }) {
-  return (
-    <Card>
-      <div className="flex flex-wrap gap-3">
-        <StatusBadge label={PAYMENT_STATUS_LABELS[order.paymentStatus]} />
-        <StatusBadge label={PRODUCTION_STATUS_LABELS[order.productionStatus]} />
-      </div>
-      <h2 className="mt-4 text-xl font-medium text-stone-100">{order.orderNumber}</h2>
-      <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
-        <div>
-          <dt className="text-stone-500">Product</dt>
-          <dd className="text-stone-200">{productLabel(order.productOption)}</dd>
-        </div>
-        <div>
-          <dt className="text-stone-500">Quantity</dt>
-          <dd className="text-stone-200">{order.quantity}</dd>
-        </div>
-        <div>
-          <dt className="text-stone-500">Total</dt>
-          <dd className="text-stone-200">{formatAud(order.totalPrice)}</dd>
-        </div>
-        {order.trackingNumber && (
-          <div>
-            <dt className="text-stone-500">Tracking</dt>
-            <dd className="text-stone-200">{order.trackingNumber}</dd>
-          </div>
-        )}
-      </dl>
-      {order.customerNotes && (
-        <p className="mt-4 rounded-md border border-copper/20 bg-black/40 p-4 text-sm text-stone-300">
-          {order.customerNotes}
-        </p>
-      )}
-      {order.statusHistory && order.statusHistory.length > 0 && (
-        <div className="mt-6">
-          <h3 className="text-sm uppercase tracking-wide text-stone-500">Status history</h3>
-          <ul className="mt-3 space-y-2 text-sm text-stone-400">
-            {order.statusHistory.map((entry, index) => (
-              <li key={`${entry.createdAt}-${index}`}>
-                {PRODUCTION_STATUS_LABELS[entry.status as keyof typeof PRODUCTION_STATUS_LABELS]} —{" "}
-                {formatDateTime(entry.createdAt)}
-                {entry.note ? ` (${entry.note})` : ""}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </Card>
-  );
-}
-
-export function OrderStatusLookup() {
+export function OrderStatusLookup({ isLoggedIn }: OrderStatusLookupProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const [mode, setMode] = useState<"loading" | "logged-in" | "guest">("loading");
+  const orderNumberParam = searchParams.get("orderNumber");
+
   const [orders, setOrders] = useState<OrderSummary[]>([]);
-  const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
-  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [trackingOrder, setTrackingOrder] = useState<OrderTrackingData | null>(null);
+  const [loadingList, setLoadingList] = useState(isLoggedIn);
+  const [loadingTracking, setLoadingTracking] = useState(false);
 
   const [orderNumber, setOrderNumber] = useState("");
   const [email, setEmail] = useState("");
-  const [guestOrder, setGuestOrder] = useState<OrderDetail | null>(null);
+  const [guestTracking, setGuestTracking] = useState<OrderTrackingData | null>(null);
   const [error, setError] = useState("");
   const [loadingGuest, setLoadingGuest] = useState(false);
 
-  const loadOrderDetail = useCallback(async (orderId: string) => {
-    setLoadingDetail(true);
+  const loadTracking = useCallback(async (orderId: string, orderNumberForUrl: string) => {
+    setLoadingTracking(true);
     setError("");
-    setSelectedOrder(null);
 
     const response = await fetch(`/api/orders/${orderId}`);
     const data = await response.json();
-    setLoadingDetail(false);
+    setLoadingTracking(false);
 
     if (!response.ok) {
-      setError(data.error ?? "Unable to load order");
+      setTrackingOrder(null);
+      setError(data.error ?? "Unable to load tracking");
       return;
     }
 
-    setSelectedOrder(data.order);
-  }, []);
+    setTrackingOrder(data.order);
+    if (searchParams.get("orderNumber") !== orderNumberForUrl) {
+      router.replace(`/order/status?orderNumber=${encodeURIComponent(orderNumberForUrl)}`, {
+        scroll: false,
+      });
+    }
+  }, [router, searchParams]);
 
   useEffect(() => {
+    if (!isLoggedIn) return;
+
+    let cancelled = false;
+    setLoadingList(true);
+
     fetch("/api/orders")
       .then(async (response) => {
-        if (response.status === 401) {
-          setMode("guest");
-          return;
-        }
         const data = await response.json();
         if (!response.ok) throw new Error(data.error ?? "Unable to load orders");
-        const loaded: OrderSummary[] = data.orders ?? [];
-        setOrders(loaded);
-        setMode("logged-in");
-
-        const orderNumberParam = searchParams.get("orderNumber");
-        if (orderNumberParam) {
-          const match = loaded.find((o) => o.orderNumber === orderNumberParam);
-          if (match) await loadOrderDetail(match.id);
-        }
+        if (cancelled) return;
+        setOrders(data.orders ?? []);
       })
       .catch((err) => {
-        setError(err.message);
-        setMode("guest");
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : "Unable to load orders");
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingList(false);
       });
-  }, [searchParams, loadOrderDetail]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (!isLoggedIn || loadingList || orders.length === 0 || !orderNumberParam) return;
+    if (trackingOrder?.orderNumber === orderNumberParam) return;
+
+    const match = orders.find((o) => o.orderNumber === orderNumberParam);
+    if (match) void loadTracking(match.id, match.orderNumber);
+  }, [isLoggedIn, loadingList, orders, orderNumberParam, trackingOrder?.orderNumber, loadTracking]);
+
+  function handleSelectOrder(order: OrderSummary) {
+    void loadTracking(order.id, order.orderNumber);
+  }
+
+  function handleBackToList() {
+    setTrackingOrder(null);
+    setError("");
+    router.replace("/order/status", { scroll: false });
+  }
 
   async function handleGuestLookup(event: React.FormEvent) {
     event.preventDefault();
     setLoadingGuest(true);
     setError("");
-    setGuestOrder(null);
+    setGuestTracking(null);
 
     const response = await fetch(
       `/api/orders?orderNumber=${encodeURIComponent(orderNumber)}&email=${encodeURIComponent(email)}`,
@@ -147,77 +122,86 @@ export function OrderStatusLookup() {
       return;
     }
 
-    setGuestOrder(data.order);
+    setGuestTracking(data.order);
   }
 
-  if (mode === "loading") {
-    return (
-      <Card>
-        <p className="text-stone-400">Loading...</p>
-      </Card>
-    );
-  }
+  if (isLoggedIn) {
+    if (loadingList && !trackingOrder) {
+      return (
+        <Card>
+          <p className="text-stone-400">Loading your orders...</p>
+        </Card>
+      );
+    }
 
-  if (mode === "logged-in") {
+    if (trackingOrder || loadingTracking) {
+      return (
+        <div className="space-y-4">
+          <button
+            type="button"
+            onClick={handleBackToList}
+            className="text-sm text-copper-light hover:underline"
+          >
+            ← Back to your orders
+          </button>
+          {error && <p className="text-sm text-red-400">{error}</p>}
+          {loadingTracking ? (
+            <Card>
+              <p className="text-stone-400">Loading tracking updates...</p>
+            </Card>
+          ) : (
+            trackingOrder && <OrderTrackingView order={trackingOrder} />
+          )}
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-6">
         {error && <p className="text-sm text-red-400">{error}</p>}
 
         {orders.length === 0 ? (
           <Card>
-            <p className="text-stone-400">You don&apos;t have any commissions yet.</p>
+            <p className="text-stone-400">You don&apos;t have any orders yet.</p>
             <Button href="/order" className="mt-4">
               Upload Your Mini
             </Button>
           </Card>
         ) : (
-          <>
-            <div className="space-y-3">
-              <p className="text-sm text-stone-400">Select an order to view its status.</p>
-              {orders.map((order) => (
-                <button
-                  key={order.id}
-                  type="button"
-                  onClick={() => loadOrderDetail(order.id)}
-                  className={`w-full rounded-xl border p-5 text-left transition hover:border-copper/40 ${
-                    selectedOrder?.id === order.id
-                      ? "border-copper bg-copper/10"
-                      : "border-copper/20 bg-charcoal"
-                  }`}
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                      <p className="font-medium text-stone-100">{order.orderNumber}</p>
-                      <p className="mt-1 text-sm text-stone-400">
-                        {productLabel(order.productOption)} × {order.quantity} —{" "}
-                        {formatAud(order.totalPrice)}
-                      </p>
-                      <p className="mt-1 text-xs text-stone-500">{formatDateTime(order.createdAt)}</p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <StatusBadge label={PAYMENT_STATUS_LABELS[order.paymentStatus]} />
-                      <StatusBadge label={PRODUCTION_STATUS_LABELS[order.productionStatus]} />
-                    </div>
+          <div className="space-y-3">
+            <p className="text-sm text-stone-400">Select an order to view tracking updates.</p>
+            {orders.map((order) => (
+              <button
+                key={order.id}
+                type="button"
+                onClick={() => handleSelectOrder(order)}
+                className="w-full rounded-xl border border-copper/20 bg-charcoal p-5 text-left transition hover:border-copper/40"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <p className="font-medium text-stone-100">{order.orderNumber}</p>
+                    <p className="mt-1 text-sm text-stone-400">
+                      {productLabel(order.productOption)} × {order.quantity} —{" "}
+                      {formatAud(order.totalPrice)}
+                    </p>
+                    <p className="mt-1 text-xs text-stone-500">{formatDateTime(order.createdAt)}</p>
                   </div>
-                </button>
-              ))}
-            </div>
-
-            {loadingDetail && (
-              <Card>
-                <p className="text-stone-400">Loading order details...</p>
-              </Card>
-            )}
-
-            {selectedOrder && !loadingDetail && <OrderDetailCard order={selectedOrder} />}
-          </>
+                  <div className="flex flex-wrap gap-2">
+                    <StatusBadge label={PRODUCTION_STATUS_LABELS[order.productionStatus]} />
+                    <StatusBadge label={PAYMENT_STATUS_LABELS[order.paymentStatus]} />
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
         )}
 
         <p className="text-sm text-stone-500">
-          Need to reorder?{" "}
+          Order details and reordering are on{" "}
           <Link href="/account/orders" className="text-copper-light hover:underline">
-            View all orders
+            My Orders
           </Link>
+          .
         </p>
       </div>
     );
@@ -225,47 +209,61 @@ export function OrderStatusLookup() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <p className="mb-4 text-sm text-stone-400">
-          Log in to see your orders automatically, or look up a guest order below.
-        </p>
-        <form onSubmit={handleGuestLookup} className="grid gap-4 md:grid-cols-2">
-          <label className="block space-y-2">
-            <span className="text-sm text-stone-300">Order number</span>
-            <input
-              value={orderNumber}
-              onChange={(e) => setOrderNumber(e.target.value)}
-              required
-              className="w-full rounded-md border border-stone-700 bg-black px-3 py-2"
-            />
-          </label>
-          <label className="block space-y-2">
-            <span className="text-sm text-stone-300">Email</span>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full rounded-md border border-stone-700 bg-black px-3 py-2"
-            />
-          </label>
-          <div className="md:col-span-2">
-            <Button type="submit" disabled={loadingGuest}>
-              {loadingGuest ? "Looking up..." : "Track Order"}
-            </Button>
-          </div>
-        </form>
-        {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
-        <p className="mt-4 text-sm text-stone-500">
-          Have an account?{" "}
-          <Link href="/login" className="text-copper-light hover:underline">
-            Log in
-          </Link>{" "}
-          to see all your orders.
-        </p>
-      </Card>
-
-      {guestOrder && <OrderDetailCard order={guestOrder} />}
+      {guestTracking ? (
+        <div className="space-y-4">
+          <button
+            type="button"
+            onClick={() => {
+              setGuestTracking(null);
+              setError("");
+            }}
+            className="text-sm text-copper-light hover:underline"
+          >
+            ← Look up another order
+          </button>
+          <OrderTrackingView order={guestTracking} />
+        </div>
+      ) : (
+        <Card>
+          <p className="mb-4 text-sm text-stone-400">
+            Log in to see your orders automatically, or look up a guest order below.
+          </p>
+          <form onSubmit={handleGuestLookup} className="grid gap-4 md:grid-cols-2">
+            <label className="block space-y-2">
+              <span className="text-sm text-stone-300">Order number</span>
+              <input
+                value={orderNumber}
+                onChange={(e) => setOrderNumber(e.target.value)}
+                required
+                className="w-full rounded-md border border-stone-700 bg-black px-3 py-2"
+              />
+            </label>
+            <label className="block space-y-2">
+              <span className="text-sm text-stone-300">Email</span>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full rounded-md border border-stone-700 bg-black px-3 py-2"
+              />
+            </label>
+            <div className="md:col-span-2">
+              <Button type="submit" disabled={loadingGuest}>
+                {loadingGuest ? "Looking up..." : "Track Order"}
+              </Button>
+            </div>
+          </form>
+          {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
+          <p className="mt-4 text-sm text-stone-500">
+            Have an account?{" "}
+            <Link href="/login" className="text-copper-light hover:underline">
+              Log in
+            </Link>{" "}
+            to see all your orders.
+          </p>
+        </Card>
+      )}
     </div>
   );
 }

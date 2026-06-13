@@ -76,6 +76,20 @@ export const PAYMENT_STATUS_LABELS = {
   failed: "Failed",
 } as const;
 
+/** Happy-path production stages shown on the order tracking page. */
+export const TRACKING_PIPELINE = [
+  "submitted",
+  "paid",
+  "human_review",
+  "approved",
+  "printing",
+  "plating",
+  "polishing",
+  "packaging",
+  "shipped",
+  "completed",
+] as const satisfies readonly ProductionStatus[];
+
 export const LEGAL_CHECKOUT_TEXT = {
   review:
     "Each uploaded model is reviewed after payment. If a file is unsuitable for production and cannot reasonably be corrected, the order may be cancelled and refunded.",
