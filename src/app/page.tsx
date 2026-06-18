@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Button, Card } from "@/components/ui";
-import { PhotoPlaceholder, TrustSignalGrid } from "@/components/workshop";
+import { TrustSignalGrid } from "@/components/workshop";
 import {
   ABOUT_MAKER,
   FOUNDER,
@@ -49,10 +49,10 @@ export default async function HomePage() {
             </Button>
           </div>
         </div>
-        <PhotoPlaceholder
-          aspect="square"
-          label="Product photography"
-          caption="Finished copper-plated miniature — photo coming soon."
+        <img
+          src="/hero.jpg"
+          alt="Copper-plated tabletop miniature"
+          className="aspect-square w-full rounded-xl border border-copper/20 object-cover"
         />
       </section>
 
