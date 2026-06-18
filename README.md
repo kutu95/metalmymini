@@ -103,25 +103,23 @@ npm run db:migrate
 npm run build
 ```
 
-Run with PM2 or systemd on port 3009:
+Run with PM2 on port 3009 (use the ecosystem file so cwd and port are correct):
 
 ```bash
-PORT=3009 npm run start
-```
-
-Ensure `DATABASE_URL` and `DIRECT_URL` are set in `/var/www/metalmymini/.env`.
-Migrations create/use the `metal` schema only — safe on a shared Supabase instance.
-
-**Important:** The server currently uses nginx on port 3009 for the old static placeholder. Replace that with the Node app:
-
-1. Stop/disable the nginx `metalmymini` site on port 3009
-2. Run the Next.js app on port 3009 (PM2 example below)
-3. Cloudflare tunnel already points `metal.margies.app` → `localhost:3009`
-
-```bash
-pm2 start npm --name metalmymini -- start
+cd /var/www/metalmymini
+pm2 delete metalmymini 2>/dev/null || true
+pm2 start ecosystem.config.cjs
 pm2 save
 ```
+
+Verify the app is listening:
+
+```bash
+curl -s -o /dev/null -w "HTTP %{http_code}\n" http://127.0.0.1:3009/
+pm2 logs metalmymini --lines 30 --nostream
+```
+
+If `curl` returns "Connection refused", check logs for missing `SESSION_SECRET`, `DATABASE_URL`, or a port conflict.
 
 Uploaded model files are stored in `storage/uploads/` (outside the public web root). Gallery images are stored in `storage/gallery/`.
 
