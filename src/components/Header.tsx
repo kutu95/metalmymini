@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LogoutButton } from "@/components/LogoutButton";
 
 const links = [
   { href: "/", label: "Home" },
@@ -82,11 +83,7 @@ export function Header({
               <Link href="/account/orders" className="text-sm text-stone-300 hover:text-copper-light">
                 My Orders
               </Link>
-              <form action="/api/auth/logout" method="post">
-                <button type="submit" className="text-sm text-stone-400 hover:text-copper-light">
-                  Log out
-                </button>
-              </form>
+              <LogoutButton />
             </>
           ) : (
             <>
@@ -156,14 +153,7 @@ export function Header({
                     onClick={closeMenu}
                     className="text-base"
                   />
-                  <form action="/api/auth/logout" method="post">
-                    <button
-                      type="submit"
-                      className="text-base text-stone-400 transition hover:text-copper-light"
-                    >
-                      Log out
-                    </button>
-                  </form>
+                  <LogoutButton className="text-base text-stone-400 transition hover:text-copper-light" />
                 </>
               ) : (
                 <>
