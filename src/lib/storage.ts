@@ -17,9 +17,14 @@ export function getGalleryDir() {
   return path.join(STORAGE_ROOT, "gallery");
 }
 
+export function getHeroDir() {
+  return path.join(STORAGE_ROOT, "hero");
+}
+
 export async function ensureStorageDirs() {
   await mkdir(getUploadsDir(), { recursive: true });
   await mkdir(getGalleryDir(), { recursive: true });
+  await mkdir(getHeroDir(), { recursive: true });
 }
 
 export function getMaxUploadBytes() {
@@ -73,6 +78,23 @@ export async function saveGalleryImage(file: File) {
 
   const storedFilename = `${randomUUID()}${ext}`;
   const filePath = path.join(getGalleryDir(), storedFilename);
+  const buffer = Buffer.from(await file.arrayBuffer());
+  await writeFile(filePath, buffer);
+
+  return { storedFilename, filePath };
+}
+
+export async function saveHeroImage(file: File) {
+  const allowed = [".jpg", ".jpeg", ".png", ".webp"];
+  const ext = path.extname(file.name).toLowerCase();
+  if (!allowed.includes(ext)) {
+    throw new Error("Hero images must be JPG, PNG, or WebP.");
+  }
+
+  await ensureStorageDirs();
+
+  const storedFilename = `${randomUUID()}${ext}`;
+  const filePath = path.join(getHeroDir(), storedFilename);
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(filePath, buffer);
 

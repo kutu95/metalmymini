@@ -61,3 +61,9 @@ export const galleryItemSchema = z.object({
   published: z.boolean(),
   relatedOrderId: z.string().optional(),
 });
+
+export const heroImageSchema = z.object({
+  altText: z.string().optional(),
+  published: z.boolean(),
+  sortOrder: z.number().int().min(0),
+});

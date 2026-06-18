@@ -46,6 +46,9 @@ export default function AdminDashboardPage() {
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <PageHeading title="Admin Dashboard" subtitle="Manage orders, review files, and update production status." />
         <div className="flex gap-3">
+          <Button href="/admin/hero" variant="secondary">
+            Hero Images
+          </Button>
           <Button href="/admin/gallery" variant="secondary">
             Gallery Manager
           </Button>

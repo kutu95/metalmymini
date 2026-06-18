@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Button, Card } from "@/components/ui";
+import { HeroSlideshow } from "@/components/HeroSlideshow";
 import { TrustSignalGrid } from "@/components/workshop";
 import {
   ABOUT_MAKER,
@@ -11,6 +12,17 @@ import {
   TRUST_SIGNALS,
 } from "@/lib/constants";
 import { productLabel } from "@/lib/format";
+
+async function getHeroImages() {
+  try {
+    return await prisma.heroImage.findMany({
+      where: { published: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    });
+  } catch {
+    return [];
+  }
+}
 
 async function getGalleryPreview() {
   try {
@@ -25,7 +37,16 @@ async function getGalleryPreview() {
 }
 
 export default async function HomePage() {
-  const gallery = await getGalleryPreview();
+  const [heroImages, gallery] = await Promise.all([getHeroImages(), getGalleryPreview()]);
+
+  const heroSlides =
+    heroImages.length > 0
+      ? heroImages.map((image) => ({
+          id: image.id,
+          src: `/api/files/hero/${image.imagePath}`,
+          alt: image.altText ?? "Copper-plated tabletop miniature",
+        }))
+      : [{ id: "fallback", src: "/hero.jpg", alt: "Copper-plated tabletop miniature" }];
 
   return (
     <div className="space-y-20">
@@ -49,11 +70,7 @@ export default async function HomePage() {
             </Button>
           </div>
         </div>
-        <img
-          src="/hero.jpg"
-          alt="Copper-plated tabletop miniature"
-          className="aspect-square w-full rounded-xl border border-copper/20 object-cover"
-        />
+        <HeroSlideshow images={heroSlides} />
       </section>
 
       {/* Product — Finishes */}
