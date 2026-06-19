@@ -1,5 +1,13 @@
 import { Card, PageHeading } from "@/components/ui";
 import { LEGAL_CHECKOUT_TEXT, MAX_MODEL_DIMENSION_MM, ACCEPTED_FILE_TYPES } from "@/lib/constants";
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
+  title: "How It Works",
+  description:
+    "Learn how Metal My Mini turns your STL, OBJ, or 3MF file into a copper-plated tabletop miniature — upload, expert review, production, and worldwide shipping.",
+  path: "/how-it-works",
+});
 
 export default function HowItWorksPage() {
   return (

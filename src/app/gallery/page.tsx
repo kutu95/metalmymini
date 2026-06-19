@@ -1,6 +1,14 @@
 import { prisma } from "@/lib/db";
 import { Card, PageHeading } from "@/components/ui";
 import { formatDate, productLabel } from "@/lib/format";
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
+  title: "Gallery",
+  description:
+    "Browse completed copper-plated tabletop miniatures from Metal My Mini customers — real results from custom STL prints with specialist copper finishes.",
+  path: "/gallery",
+});
 
 async function getGalleryItems() {
   try {

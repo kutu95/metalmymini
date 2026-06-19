@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getCurrentUser } from "@/lib/auth";
+import { DEFAULT_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,9 +17,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Metal My Mini — Premium Copper-Plated Miniatures",
-  description:
-    "Specialist copper-plated tabletop miniatures from your 3D model files. Expert review, premium finishes, worldwide shipping.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Custom Copper-Plated Miniatures | Metal My Mini",
+    template: "%s | Metal My Mini",
+  },
+  description: DEFAULT_DESCRIPTION,
+  openGraph: {
+    type: "website",
+    locale: "en_AU",
+    siteName: SITE_NAME,
+    title: "Custom Copper-Plated Miniatures | Metal My Mini",
+    description: DEFAULT_DESCRIPTION,
+    url: SITE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Custom Copper-Plated Miniatures | Metal My Mini",
+    description: DEFAULT_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default async function RootLayout({

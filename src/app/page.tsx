@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Button, Card } from "@/components/ui";
 import { HeroSlideshow } from "@/components/HeroSlideshow";
+import { JsonLd } from "@/components/JsonLd";
 import { TrustSignalGrid } from "@/components/workshop";
 import {
   ABOUT_MAKER,
@@ -12,6 +13,13 @@ import {
   TRUST_SIGNALS,
 } from "@/lib/constants";
 import { productLabel } from "@/lib/format";
+import { createPageMetadata, DEFAULT_DESCRIPTION, getHomeJsonLd } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
+  title: "Custom Copper-Plated Miniatures",
+  description: DEFAULT_DESCRIPTION,
+  path: "/",
+});
 
 async function getHeroImages() {
   try {
@@ -49,7 +57,9 @@ export default async function HomePage() {
       : [{ id: "fallback", src: "/hero.jpg", alt: "Copper-plated tabletop miniature" }];
 
   return (
-    <div className="space-y-20">
+    <>
+      <JsonLd data={getHomeJsonLd()} />
+      <div className="space-y-20">
       {/* 1. Product — Hero */}
       <section className="grid items-center gap-12 lg:grid-cols-2">
         <div>
@@ -170,5 +180,6 @@ export default async function HomePage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

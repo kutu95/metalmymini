@@ -2,6 +2,14 @@ import { Suspense } from "react";
 import { PageHeading } from "@/components/ui";
 import { OrderStatusLookup } from "@/components/OrderStatusLookup";
 import { getCurrentUser } from "@/lib/auth";
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
+  title: "Track Your Order",
+  description: "Track the production status of your Metal My Mini order using your order number and email.",
+  path: "/order/status",
+  noIndex: true,
+});
 
 export default async function OrderStatusPage() {
   const user = await getCurrentUser().catch(() => null);
