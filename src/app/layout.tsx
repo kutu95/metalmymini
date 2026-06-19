@@ -30,6 +30,13 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <script
+          defer
+          data-domain="metalmymini.com"
+          src="https://analytics.margies.app/js/script.js"
+        />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased`}>
         <div className="flex min-h-screen flex-col">
           <Header user={user} />
