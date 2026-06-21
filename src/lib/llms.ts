@@ -1,9 +1,9 @@
-import { SITE_NAME, SITE_NAME_ALT, SITE_URL } from "@/lib/seo";
+import { BUSINESS_LOCATION_DISPLAY, SITE_NAME, SITE_NAME_ALT, SITE_URL } from "@/lib/seo";
 
 export function getLlmsTxt(): string {
   return `# ${SITE_NAME}
 
-> ${SITE_NAME_ALT} is an Australian service that manufactures custom tabletop gaming miniatures from customer-supplied STL, OBJ, and 3MF files.
+> ${SITE_NAME_ALT} is an Australian service based in ${BUSINESS_LOCATION_DISPLAY} that manufactures custom tabletop gaming miniatures from customer-supplied STL, OBJ, and 3MF files.
 
 ## Services
 
@@ -11,6 +11,10 @@ export function getLlmsTxt(): string {
 - Copper electroplating
 - Custom miniature production
 - Specialist copper-plated finishes (cosmetic and heavy-duty)
+
+## Location
+
+- ${BUSINESS_LOCATION_DISPLAY}
 
 ## Website
 

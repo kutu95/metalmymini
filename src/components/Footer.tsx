@@ -1,4 +1,5 @@
 import { FOUNDER } from "@/lib/constants";
+import { BUSINESS_LOCATION_DISPLAY } from "@/lib/seo";
 import Link from "next/link";
 
 export function Footer() {
@@ -11,6 +12,7 @@ export function Footer() {
             Specialist copper-plated tabletop miniatures. Operated by {FOUNDER.name} — premium
             finishing with expert review on every order.
           </p>
+          <p className="mt-2 text-sm text-stone-600">{BUSINESS_LOCATION_DISPLAY}</p>
         </div>
         <div className="flex flex-wrap gap-4 text-sm text-stone-400">
           <Link href="/how-it-works" className="hover:text-copper-light">

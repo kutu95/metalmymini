@@ -9,6 +9,17 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "https://metalmymini
 export const SITE_NAME = "Metal My Mini";
 export const SITE_NAME_ALT = "MetalMyMini";
 
+/** City-level location only — no street address or postcode. */
+export const BUSINESS_LOCATION = {
+  locality: "Melbourne",
+  region: "Victoria",
+  regionCode: "VIC",
+  country: "Australia",
+  countryCode: "AU",
+} as const;
+
+export const BUSINESS_LOCATION_DISPLAY = "Melbourne, Victoria, Australia";
+
 export const DEFAULT_DESCRIPTION =
   "Upload your STL file and receive a professionally printed and copper-plated tabletop miniature. Specialist finishes, expert review, worldwide shipping.";
 
@@ -84,25 +95,77 @@ export function createPageMetadata({
   };
 }
 
-export function getHomeJsonLd() {
+const DEFAULT_PRODUCT_IMAGE = `${SITE_URL}/hero.jpg`;
+
+function toAbsoluteUrl(pathOrUrl: string): string {
+  return pathOrUrl.startsWith("http") ? pathOrUrl : `${SITE_URL}${pathOrUrl}`;
+}
+
+function buildProductOffer() {
+  return {
+    "@type": "Offer",
+    priceCurrency: "AUD",
+    availability: "https://schema.org/InStock",
+    url: `${SITE_URL}/order`,
+    itemCondition: "https://schema.org/NewCondition",
+    shippingDetails: {
+      "@type": "OfferShippingDetails",
+      shippingRate: {
+        "@type": "MonetaryAmount",
+        value: "0",
+        currency: "AUD",
+      },
+      shippingDestination: {
+        "@type": "DefinedRegion",
+        addressCountry: BUSINESS_LOCATION.countryCode,
+      },
+      deliveryTime: {
+        "@type": "ShippingDeliveryTime",
+        handlingTime: {
+          "@type": "QuantitativeValue",
+          minValue: 5,
+          maxValue: 21,
+          unitCode: "DAY",
+        },
+        transitTime: {
+          "@type": "QuantitativeValue",
+          minValue: 3,
+          maxValue: 21,
+          unitCode: "DAY",
+        },
+      },
+    },
+    hasMerchantReturnPolicy: {
+      "@type": "MerchantReturnPolicy",
+      applicableCountry: BUSINESS_LOCATION.countryCode,
+      returnPolicyCategory: "https://schema.org/MerchantReturnNotPermitted",
+      merchantReturnDays: 0,
+    },
+  };
+}
+
+export function getHomeJsonLd(productImageUrls?: string[]) {
   const organizationId = `${SITE_URL}/#organization`;
   const websiteId = `${SITE_URL}/#website`;
+
+  const images =
+    productImageUrls && productImageUrls.length > 0
+      ? productImageUrls.map(toAbsoluteUrl)
+      : [DEFAULT_PRODUCT_IMAGE];
 
   const products = Object.values(PRODUCTS).map((product) => ({
     "@type": "Product",
     "@id": `${SITE_URL}/#product-${product.id}`,
     name: product.name,
     description: product.description,
+    image: images,
     brand: {
       "@type": "Brand",
       name: SITE_NAME,
     },
     offers: {
-      "@type": "Offer",
+      ...buildProductOffer(),
       price: (product.priceCents / 100).toFixed(2),
-      priceCurrency: "AUD",
-      availability: "https://schema.org/InStock",
-      url: `${SITE_URL}/order`,
     },
   }));
 
@@ -119,6 +182,16 @@ export function getHomeJsonLd() {
         founder: {
           "@type": "Person",
           name: "Shay",
+        },
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: BUSINESS_LOCATION.locality,
+          addressRegion: BUSINESS_LOCATION.regionCode,
+          addressCountry: BUSINESS_LOCATION.countryCode,
+        },
+        areaServed: {
+          "@type": "Country",
+          name: BUSINESS_LOCATION.country,
         },
       },
       {

@@ -56,9 +56,14 @@ export default async function HomePage() {
         }))
       : [{ id: "fallback", src: "/hero.jpg", alt: "Copper-plated tabletop miniature" }];
 
+  const productImages = [
+    ...heroSlides.map((slide) => slide.src),
+    ...gallery.map((item) => `/api/files/gallery/${item.imagePath}`),
+  ];
+
   return (
     <>
-      <JsonLd data={getHomeJsonLd()} />
+      <JsonLd data={getHomeJsonLd(productImages)} />
       <div className="space-y-20">
       {/* 1. Product — Hero */}
       <section className="grid items-center gap-12 lg:grid-cols-2">
