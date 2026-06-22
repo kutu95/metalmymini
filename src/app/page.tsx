@@ -179,6 +179,13 @@ export default async function HomePage() {
           <li>{LEGAL_CHECKOUT_TEXT.review}</li>
           <li>{LEGAL_CHECKOUT_TEXT.gallery}</li>
           <li>{LEGAL_CHECKOUT_TEXT.contact}</li>
+          <li>
+            See our{" "}
+            <Link href="/returns" className="text-copper-light hover:underline">
+              Return and Refund Policy
+            </Link>{" "}
+            for cancellations, defective items, and refund conditions.
+          </li>
         </ul>
         <div className="mt-8">
           <Button href="/order">Upload Your Mini</Button>

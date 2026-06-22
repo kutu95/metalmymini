@@ -27,6 +27,9 @@ export function Footer() {
           <Link href="/order" className="hover:text-copper-light">
             Order
           </Link>
+          <Link href="/returns" className="hover:text-copper-light">
+            Returns
+          </Link>
         </div>
       </div>
     </footer>

@@ -25,6 +25,7 @@ export function getLlmsTxt(): string {
 - Home: ${SITE_URL}/
 - Order: ${SITE_URL}/order
 - How it works: ${SITE_URL}/how-it-works
+- Returns and refunds: ${SITE_URL}/returns
 - Gallery: ${SITE_URL}/gallery
 - Sitemap: ${SITE_URL}/sitemap.xml
 

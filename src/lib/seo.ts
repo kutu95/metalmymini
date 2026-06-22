@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PRODUCTS } from "@/lib/constants";
+import { RETURN_POLICY_PATH } from "@/lib/returns-policy";
 
 export const SITE_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "https://metalmymini.com").replace(
   /\/$/,
@@ -53,6 +54,11 @@ export const FAQ_ITEMS = [
     answer:
       "Use the Track Order page with your order number and email, or log in to view all your orders and status updates.",
   },
+  {
+    question: "What is your return and refund policy?",
+    answer:
+      "Custom-made miniatures cannot be returned for change of mind. If your order arrives damaged or with a manufacturing defect, contact us within 14 days. See our Return and Refund Policy for full details.",
+  },
 ] as const;
 
 type PageMetaInput = {
@@ -97,6 +103,23 @@ export function createPageMetadata({
 
 const DEFAULT_PRODUCT_IMAGE = `${SITE_URL}/hero.jpg`;
 
+export const MERCHANT_RETURN_POLICY_ID = `${SITE_URL}${RETURN_POLICY_PATH}#return-policy`;
+
+/** Schema.org MerchantReturnPolicy — linked from all Product Offer objects. */
+export function getMerchantReturnPolicyJsonLd() {
+  return {
+    "@type": "MerchantReturnPolicy",
+    "@id": MERCHANT_RETURN_POLICY_ID,
+    name: "Return and Refund Policy",
+    url: `${SITE_URL}${RETURN_POLICY_PATH}`,
+    applicableCountry: BUSINESS_LOCATION.countryCode,
+    returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+    merchantReturnDays: 14,
+    returnMethod: "https://schema.org/ReturnByMail",
+    returnFees: "https://schema.org/ReturnFeesCustomerResponsibility",
+  };
+}
+
 function toAbsoluteUrl(pathOrUrl: string): string {
   return pathOrUrl.startsWith("http") ? pathOrUrl : `${SITE_URL}${pathOrUrl}`;
 }
@@ -136,10 +159,7 @@ function buildProductOffer() {
       },
     },
     hasMerchantReturnPolicy: {
-      "@type": "MerchantReturnPolicy",
-      applicableCountry: BUSINESS_LOCATION.countryCode,
-      returnPolicyCategory: "https://schema.org/MerchantReturnNotPermitted",
-      merchantReturnDays: 0,
+      "@id": MERCHANT_RETURN_POLICY_ID,
     },
   };
 }
@@ -148,17 +168,17 @@ export function getHomeJsonLd(productImageUrls?: string[]) {
   const organizationId = `${SITE_URL}/#organization`;
   const websiteId = `${SITE_URL}/#website`;
 
-  const images =
+  const heroImages =
     productImageUrls && productImageUrls.length > 0
       ? productImageUrls.map(toAbsoluteUrl)
-      : [DEFAULT_PRODUCT_IMAGE];
+      : [];
 
   const products = Object.values(PRODUCTS).map((product) => ({
     "@type": "Product",
     "@id": `${SITE_URL}/#product-${product.id}`,
     name: product.name,
     description: product.description,
-    image: images,
+    image: [DEFAULT_PRODUCT_IMAGE, ...heroImages.filter((url) => url !== DEFAULT_PRODUCT_IMAGE)],
     brand: {
       "@type": "Brand",
       name: SITE_NAME,
@@ -206,6 +226,7 @@ export function getHomeJsonLd(productImageUrls?: string[]) {
         inLanguage: "en-AU",
       },
       ...products,
+      getMerchantReturnPolicyJsonLd(),
       {
         "@type": "FAQPage",
         "@id": `${SITE_URL}/#faq`,

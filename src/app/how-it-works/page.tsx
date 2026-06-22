@@ -1,6 +1,7 @@
 import { Card, PageHeading } from "@/components/ui";
 import { LEGAL_CHECKOUT_TEXT, MAX_MODEL_DIMENSION_MM, ACCEPTED_FILE_TYPES } from "@/lib/constants";
 import { createPageMetadata } from "@/lib/seo";
+import Link from "next/link";
 
 export const metadata = createPageMetadata({
   title: "How It Works",
@@ -60,6 +61,14 @@ export default function HowItWorksPage() {
             <li>{LEGAL_CHECKOUT_TEXT.gallery}</li>
             <li>{LEGAL_CHECKOUT_TEXT.contact}</li>
           </ul>
+          <p className="mt-4 text-sm text-stone-400">
+            See our{" "}
+            <Link href="/returns" className="text-copper-light hover:underline">
+              Return and Refund Policy
+            </Link>{" "}
+            for full details on cancellations, defective items, and Australian Consumer Law
+            rights.
+          </p>
         </Card>
       </div>
     </div>
