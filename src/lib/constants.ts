@@ -5,14 +5,14 @@ export const FOUNDER = {
 } as const;
 
 export const ABOUT_MAKER =
-  "Metal My Mini is operated by Shay — a tabletop gaming enthusiast, experienced resin printer, and copper plating specialist. Each submitted model is personally reviewed before production to ensure the best possible result.";
+  "I'm Shay — tabletop gamer, resin printer, and copper plater. I take your sculpt, print it in UV resin, and electroplate a real copper surface so it gleams like metal and takes a patina as it ages. I check every file myself before I print. Worth the wait — I do these one at a time.";
 
 export const PRODUCTS = {
   cosmetic_copper: {
     id: "cosmetic_copper" as const,
     name: "Cosmetic Copper Finish",
     description:
-      "Display-quality copper plating for showcase pieces and display cabinets.",
+      "A real electroplated copper surface with the sheen for display cabinets and showcase pieces — grey resin in, gleaming copper out.",
     priceCents: 5500,
     priceDisplay: "AUD $55",
   },
@@ -20,7 +20,7 @@ export const PRODUCTS = {
     id: "heavy_duty_copper" as const,
     name: "Heavy-Duty Copper Finish",
     description:
-      "Jewellery-grade copper plating with greater durability for regular handling at the table.",
+      "A tougher copper plate built for minis you handle at the table — same metallic look and surface, more durability for regular play. Not about weight; about a finish that holds up.",
     priceCents: 8000,
     priceDisplay: "AUD $80",
   },
@@ -100,29 +100,30 @@ export const LEGAL_CHECKOUT_TEXT = {
 } as const;
 
 export const PROCESS_STEPS = [
-  { step: 1, title: "Upload your model", detail: "STL, OBJ, or 3MF — up to 100 mm" },
-  { step: 2, title: "Choose your finish", detail: "Cosmetic or heavy-duty copper plating" },
-  { step: 3, title: "Pay securely", detail: "Payment taken on order submission" },
-  { step: 4, title: "Expert review", detail: "Every file checked before production begins" },
-  { step: 5, title: "Print, plate, finish", detail: "UV resin print with specialist copper plating" },
+  { step: 1, title: "Upload your sculpt", detail: "STL, OBJ, or 3MF — up to 100 mm" },
+  { step: 2, title: "Choose your finish", detail: "Cosmetic or heavy-duty copper plate" },
+  { step: 3, title: "Pay securely", detail: "Payment taken when you submit" },
+  { step: 4, title: "I check your file", detail: "I review every sculpt before I print" },
+  { step: 5, title: "Print, plate, finish", detail: "UV resin print, then real copper electroplating" },
   { step: 6, title: "Ship worldwide", detail: "Tracked delivery to your door" },
 ] as const;
 
 export const TRUST_SIGNALS = [
   {
-    title: "Specialist copper plating",
-    detail: "A finishing process focused on tabletop miniatures — not generic metal coating.",
+    title: "Real copper surface",
+    detail:
+      "Electroplated metal — not paint, not a print. It looks like copper because it is copper, and it takes a patina as it ages.",
   },
   {
-    title: "Premium finishes",
-    detail: "Two plating options designed for display or regular handling.",
+    title: "Two finishes, clear jobs",
+    detail: "Cosmetic for the cabinet. Heavy-duty for the table. Same metallic look; different durability.",
   },
   {
-    title: "Quality control",
-    detail: "Each model is reviewed before production to ensure the best possible result.",
+    title: "I check every file",
+    detail: "Before I print your mini, I review the sculpt myself — printability, size, and plating suitability.",
   },
   {
-    title: "Real results",
-    detail: "The gallery shows completed miniatures from actual customer orders.",
+    title: "Finished pieces, not mockups",
+    detail: "The gallery shows real copper-plated minis from orders I've completed.",
   },
 ] as const;

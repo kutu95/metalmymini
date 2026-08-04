@@ -5,7 +5,7 @@ import { createPageMetadata } from "@/lib/seo";
 export const metadata = createPageMetadata({
   title: "Upload Your Mini",
   description:
-    "Upload your STL, OBJ, or 3MF and order a custom copper-plated tabletop miniature. Choose cosmetic or heavy-duty copper plating with expert file review.",
+    "Upload your sculpt (STL, OBJ, or 3MF). I copper-plate custom tabletop minis — cosmetic or heavy-duty finish, and I check every file before I print.",
   path: "/order",
 });
 
@@ -14,7 +14,7 @@ export default function OrderPage() {
     <div>
       <PageHeading
         title="Upload Your Mini"
-        subtitle="Upload your model, choose a copper finish, and submit your order. Each file is reviewed before production begins."
+        subtitle="Send your sculpt, choose a copper finish, and place your order. I review every file before I print."
       />
       <OrderForm />
     </div>

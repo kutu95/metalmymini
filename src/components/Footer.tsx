@@ -9,8 +9,8 @@ export function Footer() {
         <div>
           <p className="font-medium text-stone-200">Metal My Mini</p>
           <p className="mt-2 max-w-sm text-sm leading-relaxed text-stone-500">
-            Specialist copper-plated tabletop miniatures. Operated by {FOUNDER.name} — premium
-            finishing with expert review on every order.
+            Custom copper-plated tabletop minis by {FOUNDER.name} — real electroplated copper on
+            your sculpt, one at a time.
           </p>
           <p className="mt-2 text-sm text-stone-600">{BUSINESS_LOCATION_DISPLAY}</p>
         </div>

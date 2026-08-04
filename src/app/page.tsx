@@ -69,14 +69,15 @@ export default async function HomePage() {
       <section className="grid items-center gap-12 lg:grid-cols-2">
         <div>
           <p className="mb-3 text-sm uppercase tracking-[0.2em] text-copper-light">
-            Custom copper-plated miniatures
+            Metal My Mini
           </p>
           <h1 className="text-4xl font-semibold leading-tight text-stone-100 md:text-5xl">
-            Custom miniatures with a premium copper-plated finish.
+            Your mini. Real copper. One maker.
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-stone-400">
-            Upload your STL, OBJ, or 3MF. We print in UV resin, apply specialist copper plating,
-            and finish each piece to a premium standard — worldwide shipping available.
+            Upload your STL, OBJ, or 3MF. I print in UV resin and electroplate a genuine copper
+            surface — grey resin in, gleaming copper out. Worldwide shipping. Worth the wait; I do
+            these one at a time.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Button href="/order">Upload Your Mini</Button>
@@ -92,7 +93,7 @@ export default async function HomePage() {
       <section>
         <h2 className="mb-2 text-2xl font-semibold text-stone-100">Finish options</h2>
         <p className="mb-8 max-w-2xl text-stone-400">
-          Two copper plating options for different display and handling requirements.
+          Two copper plates — same metallic look, different jobs on the table or in the cabinet.
         </p>
         <div className="grid gap-6 md:grid-cols-2">
           {Object.values(PRODUCTS).map((product) => (
@@ -111,7 +112,7 @@ export default async function HomePage() {
           <div>
             <h2 className="text-2xl font-semibold text-stone-100">Completed work</h2>
             <p className="mt-2 text-stone-400">
-              Real photographs of finished miniatures from customer orders.
+              Real photographs of copper-plated minis I&apos;ve finished for customers.
             </p>
           </div>
           <Link href="/gallery" className="text-sm text-copper-light hover:underline">
@@ -120,7 +121,7 @@ export default async function HomePage() {
         </div>
         {gallery.length === 0 ? (
           <Card>
-            <p className="text-stone-400">Completed miniatures will appear here soon.</p>
+            <p className="text-stone-400">Finished pieces will show up here as I complete orders.</p>
           </Card>
         ) : (
           <div className="grid gap-6 md:grid-cols-3">
@@ -145,7 +146,7 @@ export default async function HomePage() {
       <section>
         <h2 className="mb-2 text-2xl font-semibold text-stone-100">Why Metal My Mini</h2>
         <p className="mb-8 max-w-2xl text-stone-400">
-          A specialist service with expert review and premium finishing — backed by a real maker.
+          One obsessive specialist. Real copper on your sculpt — not a craft stall, not a faceless shop.
         </p>
         <TrustSignalGrid signals={TRUST_SIGNALS} />
       </section>
@@ -153,7 +154,7 @@ export default async function HomePage() {
       {/* 3. Process */}
       <section>
         <h2 className="mb-2 text-2xl font-semibold text-stone-100">How it works</h2>
-        <p className="mb-8 text-stone-400">From upload to delivery in six steps.</p>
+        <p className="mb-8 text-stone-400">From your file to a copper-plated mini — six steps.</p>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {PROCESS_STEPS.map((step) => (
             <Card key={step.step}>

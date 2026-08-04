@@ -22,23 +22,23 @@ export const BUSINESS_LOCATION = {
 export const BUSINESS_LOCATION_DISPLAY = "Melbourne, Victoria, Australia";
 
 export const DEFAULT_DESCRIPTION =
-  "Upload your STL file and receive a professionally printed and copper-plated tabletop miniature. Specialist finishes, expert review, worldwide shipping.";
+  "Upload your sculpt. I print in UV resin and electroplate a real copper surface — grey resin in, gleaming copper out. Solo maker in Melbourne. Worldwide shipping.";
 
 export const FAQ_ITEMS = [
   {
     question: "What file formats do you accept?",
     answer:
-      "We accept STL, OBJ, and 3MF files. Models must be up to 100 mm in any dimension.",
+      "I accept STL, OBJ, and 3MF files. Models must be up to 100 mm in any dimension.",
   },
   {
     question: "What copper finish options are available?",
     answer:
-      "Cosmetic Copper Finish (AUD $55) is ideal for display pieces. Heavy-Duty Copper Finish (AUD $80) uses jewellery-grade plating for minis handled regularly at the table.",
+      "Cosmetic Copper Finish (AUD $55) is for display cabinets and showcase pieces — a real electroplated copper surface with the sheen. Heavy-Duty Copper Finish (AUD $80) is a tougher plate for minis you handle regularly at the table.",
   },
   {
     question: "Is my model reviewed before production?",
     answer:
-      "Yes. Each uploaded model is reviewed after payment to confirm it is suitable for printing and copper plating before production begins.",
+      "Yes. I check every uploaded sculpt after payment for printability, size, and suitability for copper plating before I print.",
   },
   {
     question: "What happens if my file cannot be produced?",
@@ -47,7 +47,7 @@ export const FAQ_ITEMS = [
   },
   {
     question: "Do you ship internationally?",
-    answer: "Yes. Completed miniatures are shipped worldwide with tracking when your order ships.",
+    answer: "Yes. I ship completed miniatures worldwide with tracking when your order ships.",
   },
   {
     question: "How do I track my order?",

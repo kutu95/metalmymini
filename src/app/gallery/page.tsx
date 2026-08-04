@@ -6,7 +6,7 @@ import { createPageMetadata } from "@/lib/seo";
 export const metadata = createPageMetadata({
   title: "Gallery",
   description:
-    "Browse completed copper-plated tabletop miniatures from Metal My Mini customers — real results from custom STL prints with specialist copper finishes.",
+    "Copper-plated tabletop minis I've finished for customers — real electroplated copper surfaces on custom sculpts.",
   path: "/gallery",
 });
 
@@ -28,12 +28,12 @@ export default async function GalleryPage() {
     <div>
       <PageHeading
         title="Gallery"
-        subtitle="Completed copper-plated miniatures from Metal My Mini customers."
+        subtitle="Finished copper-plated minis from orders I've completed."
       />
 
       {items.length === 0 ? (
         <Card>
-          <p className="text-stone-400">No gallery items published yet.</p>
+          <p className="text-stone-400">Finished pieces will show up here as I complete orders.</p>
         </Card>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
