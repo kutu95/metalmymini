@@ -5,22 +5,25 @@ export const FOUNDER = {
 } as const;
 
 export const ABOUT_MAKER =
-  "I'm Shay — tabletop gamer, resin printer, and copper plater. I take your sculpt, print it in UV resin, and electroplate a real copper surface so it gleams like metal and takes a patina as it ages. I check every file myself before I print. Worth the wait — I do these one at a time.";
+  "I'm Shay. I run Metal My Mini out of Melbourne — tabletop player, resin printer, and the one who does the plating. Every model that comes in gets looked at by me before anything is printed, so what ships is the best result I can get from your file.";
+
+export const WHY_METAL_MY_MINI =
+  "It's one person, not a print farm. I review every file myself before it goes near the printer — if it won't plate cleanly, you get a revision or your money back. The gallery is real pieces from real orders, photographed as they shipped.";
 
 export const PRODUCTS = {
   cosmetic_copper: {
     id: "cosmetic_copper" as const,
-    name: "Cosmetic Copper Finish",
+    name: "Display Copper",
     description:
-      "A real electroplated copper surface with the sheen for display cabinets and showcase pieces — grey resin in, gleaming copper out.",
-    priceCents: 5500,
-    priceDisplay: "AUD $55",
+      "A genuine copper surface, electroplated over your print and polished to a metal shine. Looks like solid bronze and takes a natural patina over time.",
+    priceCents: 4500,
+    priceDisplay: "AUD $45",
   },
   heavy_duty_copper: {
     id: "heavy_duty_copper" as const,
-    name: "Heavy-Duty Copper Finish",
+    name: "Thick Copper",
     description:
-      "A tougher copper plate built for minis you handle at the table — same metallic look and surface, more durability for regular play. Not about weight; about a finish that holds up.",
+      "A thicker copper plate for minis you handle at the table — same metallic look, more copper on the surface.",
     priceCents: 8000,
     priceDisplay: "AUD $80",
   },
@@ -49,7 +52,7 @@ export const ACCEPTED_MIME_TYPES = [
 ] as const;
 
 export const MAX_MODEL_DIMENSION_MM = 100;
-export const MIN_ORDER_CENTS = 5500;
+export const MIN_ORDER_CENTS = 4500;
 
 export const PRODUCTION_STATUS_LABELS: Record<ProductionStatus, string> = {
   submitted: "Submitted",
@@ -92,38 +95,18 @@ export const TRACKING_PIPELINE = [
 
 export const LEGAL_CHECKOUT_TEXT = {
   review:
-    "Each uploaded model is reviewed after payment. If a file is unsuitable for production and cannot reasonably be corrected, the order may be cancelled and refunded.",
+    "Each model is reviewed after payment. If a file can't be produced and can't reasonably be fixed, I'll cancel and refund the order.",
   gallery:
-    "By ordering, you agree that completed work may be photographed and displayed in the Metal My Mini gallery.",
+    "By ordering, you agree completed work may be photographed for the Metal My Mini gallery.",
   contact:
-    "You may be contacted if your model requires modification, clarification, or additional processing.",
+    "I may contact you if your model needs a change, clarification, or extra processing.",
 } as const;
 
 export const PROCESS_STEPS = [
-  { step: 1, title: "Upload your sculpt", detail: "STL, OBJ, or 3MF — up to 100 mm" },
-  { step: 2, title: "Choose your finish", detail: "Cosmetic or heavy-duty copper plate" },
+  { step: 1, title: "Upload your model", detail: "STL, OBJ, or 3MF — up to 100 mm" },
+  { step: 2, title: "Choose your finish", detail: "Display Copper or Thick Copper" },
   { step: 3, title: "Pay securely", detail: "Payment taken when you submit" },
-  { step: 4, title: "I check your file", detail: "I review every sculpt before I print" },
+  { step: 4, title: "File review", detail: "I check printability, size, and how well it'll take copper" },
   { step: 5, title: "Print, plate, finish", detail: "UV resin print, then real copper electroplating" },
-  { step: 6, title: "Ship worldwide", detail: "Tracked delivery to your door" },
-] as const;
-
-export const TRUST_SIGNALS = [
-  {
-    title: "Real copper surface",
-    detail:
-      "Electroplated metal — not paint, not a print. It looks like copper because it is copper, and it takes a patina as it ages.",
-  },
-  {
-    title: "Two finishes, clear jobs",
-    detail: "Cosmetic for the cabinet. Heavy-duty for the table. Same metallic look; different durability.",
-  },
-  {
-    title: "I check every file",
-    detail: "Before I print your mini, I review the sculpt myself — printability, size, and plating suitability.",
-  },
-  {
-    title: "Finished pieces, not mockups",
-    detail: "The gallery shows real copper-plated minis from orders I've completed.",
-  },
+  { step: 6, title: "Ship worldwide", detail: "At cost, with tracking when it ships" },
 ] as const;

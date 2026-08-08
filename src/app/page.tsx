@@ -3,16 +3,15 @@ import { prisma } from "@/lib/db";
 import { Button, Card } from "@/components/ui";
 import { HeroSlideshow } from "@/components/HeroSlideshow";
 import { JsonLd } from "@/components/JsonLd";
-import { TrustSignalGrid } from "@/components/workshop";
 import {
   ABOUT_MAKER,
   FOUNDER,
   LEGAL_CHECKOUT_TEXT,
   PROCESS_STEPS,
   PRODUCTS,
-  TRUST_SIGNALS,
+  WHY_METAL_MY_MINI,
 } from "@/lib/constants";
-import { productLabel } from "@/lib/format";
+import { formatDate, productLabel } from "@/lib/format";
 import { createPageMetadata, DEFAULT_DESCRIPTION, getHomeJsonLd } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
@@ -72,12 +71,11 @@ export default async function HomePage() {
             Metal My Mini
           </p>
           <h1 className="text-4xl font-semibold leading-tight text-stone-100 md:text-5xl">
-            Your mini. Real copper. One maker.
+            Your mini, plated in real copper.
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-stone-400">
-            Upload your STL, OBJ, or 3MF. I print in UV resin and electroplate a genuine copper
-            surface — grey resin in, gleaming copper out. Worldwide shipping. Worth the wait; I do
-            these one at a time.
+            Upload your STL, OBJ, or 3MF. I print it in UV resin, electroplate it in real copper,
+            and hand-finish every piece myself. Worldwide shipping.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Button href="/order">Upload Your Mini</Button>
@@ -93,7 +91,7 @@ export default async function HomePage() {
       <section>
         <h2 className="mb-2 text-2xl font-semibold text-stone-100">Finish options</h2>
         <p className="mb-8 max-w-2xl text-stone-400">
-          Two copper plates — same metallic look, different jobs on the table or in the cabinet.
+          Display Copper for the cabinet. Thick Copper for the table.
         </p>
         <div className="grid gap-6 md:grid-cols-2">
           {Object.values(PRODUCTS).map((product) => (
@@ -112,7 +110,8 @@ export default async function HomePage() {
           <div>
             <h2 className="text-2xl font-semibold text-stone-100">Completed work</h2>
             <p className="mt-2 text-stone-400">
-              Real photographs of copper-plated minis I&apos;ve finished for customers.
+              Finished pieces from real orders. Each one is a customer&apos;s own model, printed and
+              copper-plated here.
             </p>
           </div>
           <Link href="/gallery" className="text-sm text-copper-light hover:underline">
@@ -134,7 +133,9 @@ export default async function HomePage() {
                 />
                 <div className="p-4">
                   <h3 className="font-medium text-stone-100">{item.title}</h3>
-                  <p className="mt-1 text-sm text-stone-400">{productLabel(item.finishType)}</p>
+                  <p className="mt-1 text-sm text-stone-400">
+                    {productLabel(item.finishType)} · Completed {formatDate(item.createdAt)}
+                  </p>
                 </div>
               </Card>
             ))}
@@ -145,16 +146,13 @@ export default async function HomePage() {
       {/* Trust */}
       <section>
         <h2 className="mb-2 text-2xl font-semibold text-stone-100">Why Metal My Mini</h2>
-        <p className="mb-8 max-w-2xl text-stone-400">
-          One obsessive specialist. Real copper on your sculpt — not a craft stall, not a faceless shop.
-        </p>
-        <TrustSignalGrid signals={TRUST_SIGNALS} />
+        <p className="max-w-3xl leading-relaxed text-stone-400">{WHY_METAL_MY_MINI}</p>
       </section>
 
       {/* 3. Process */}
       <section>
         <h2 className="mb-2 text-2xl font-semibold text-stone-100">How it works</h2>
-        <p className="mb-8 text-stone-400">From your file to a copper-plated mini — six steps.</p>
+        <p className="mb-8 text-stone-400">Every file is reviewed before anything is printed.</p>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {PROCESS_STEPS.map((step) => (
             <Card key={step.step}>
@@ -181,11 +179,15 @@ export default async function HomePage() {
           <li>{LEGAL_CHECKOUT_TEXT.gallery}</li>
           <li>{LEGAL_CHECKOUT_TEXT.contact}</li>
           <li>
-            See our{" "}
+            See the{" "}
             <Link href="/returns" className="text-copper-light hover:underline">
-              Return and Refund Policy
+              Refund Policy
             </Link>{" "}
-            for cancellations, defective items, and refund conditions.
+            for cancellations, faulty items, and refunds. See the{" "}
+            <Link href="/privacy" className="text-copper-light hover:underline">
+              Privacy Policy
+            </Link>{" "}
+            for how I handle your personal information.
           </li>
         </ul>
         <div className="mt-8">

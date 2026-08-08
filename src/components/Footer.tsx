@@ -9,8 +9,7 @@ export function Footer() {
         <div>
           <p className="font-medium text-stone-200">Metal My Mini</p>
           <p className="mt-2 max-w-sm text-sm leading-relaxed text-stone-500">
-            Custom copper-plated tabletop minis by {FOUNDER.name} — real electroplated copper on
-            your sculpt, one at a time.
+            Real copper-plated miniatures, made one at a time by {FOUNDER.name} in Melbourne.
           </p>
           <p className="mt-2 text-sm text-stone-600">{BUSINESS_LOCATION_DISPLAY}</p>
         </div>
@@ -29,6 +28,9 @@ export function Footer() {
           </Link>
           <Link href="/returns" className="hover:text-copper-light">
             Returns
+          </Link>
+          <Link href="/privacy" className="hover:text-copper-light">
+            Privacy
           </Link>
         </div>
       </div>

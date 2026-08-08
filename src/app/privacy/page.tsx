@@ -1,48 +1,41 @@
 import { JsonLd } from "@/components/JsonLd";
 import { Card, PageHeading } from "@/components/ui";
 import {
-  RETURN_POLICY_EFFECTIVE_DATE,
-  RETURN_POLICY_INTRO,
-  RETURN_POLICY_SECTIONS,
-  SUPPORT_EMAIL,
-  getReturnsPageJsonLd,
-} from "@/lib/returns-policy";
-import {
-  SITE_NAME,
-  SITE_URL,
-  createPageMetadata,
-  getMerchantReturnPolicyJsonLd,
-} from "@/lib/seo";
+  PRIVACY_POLICY_EFFECTIVE_DATE,
+  PRIVACY_POLICY_INTRO,
+  PRIVACY_POLICY_SECTIONS,
+  getPrivacyPageJsonLd,
+} from "@/lib/privacy-policy";
+import { SUPPORT_EMAIL } from "@/lib/returns-policy";
+import { SITE_NAME, SITE_URL, createPageMetadata } from "@/lib/seo";
 import Link from "next/link";
 
 export const metadata = createPageMetadata({
-  title: "Return and Refund Policy",
+  title: "Privacy Policy",
   description:
-    "Returns and refunds for custom copper-plated miniatures — change of mind, faulty or damaged items, cancellations, and Australian Consumer Law.",
-  path: "/returns",
+    "How Metal My Mini collects, stores, and uses personal information for custom miniature orders, accounts, and the public gallery.",
+  path: "/privacy",
 });
 
-export default function ReturnsPage() {
-  const merchantReturnPolicy = getMerchantReturnPolicyJsonLd();
-
+export default function PrivacyPage() {
   return (
     <>
-      <JsonLd data={getReturnsPageJsonLd(SITE_URL, SITE_NAME, merchantReturnPolicy)} />
+      <JsonLd data={getPrivacyPageJsonLd()} />
 
       <div>
         <PageHeading
-          title="Return and Refund Policy"
-          subtitle={`Effective date: ${formatEffectiveDate(RETURN_POLICY_EFFECTIVE_DATE)}`}
+          title="Privacy Policy"
+          subtitle={`Effective date: ${formatEffectiveDate(PRIVACY_POLICY_EFFECTIVE_DATE)}`}
         />
 
         <div className="space-y-6">
-          {RETURN_POLICY_INTRO.map((paragraph) => (
+          {PRIVACY_POLICY_INTRO.map((paragraph) => (
             <p key={paragraph} className="leading-relaxed text-stone-400">
               {paragraph}
             </p>
           ))}
 
-          {RETURN_POLICY_SECTIONS.map((section) => (
+          {PRIVACY_POLICY_SECTIONS.map((section) => (
             <Card key={section.title}>
               <h2 className="text-xl font-medium text-stone-100">{section.title}</h2>
               {section.paragraphs.map((paragraph) => (
@@ -65,7 +58,9 @@ export default function ReturnsPage() {
 
           <Card>
             <h2 className="text-xl font-medium text-stone-100">Contact Us</h2>
-            <p className="mt-3 leading-relaxed text-stone-400">Contact:</p>
+            <p className="mt-3 leading-relaxed text-stone-400">
+              For privacy questions, access requests, or deletion requests, please contact:
+            </p>
             <ul className="mt-4 space-y-2 text-stone-400">
               <li>
                 <strong className="text-stone-200">{SITE_NAME}</strong>

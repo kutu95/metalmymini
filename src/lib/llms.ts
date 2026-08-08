@@ -3,19 +3,19 @@ import { BUSINESS_LOCATION_DISPLAY, SITE_NAME, SITE_NAME_ALT, SITE_URL } from "@
 export function getLlmsTxt(): string {
   return `# ${SITE_NAME}
 
-> ${SITE_NAME_ALT} is a solo Australian maker based in ${BUSINESS_LOCATION_DISPLAY}. Shay prints custom tabletop miniatures from customer-supplied STL, OBJ, and 3MF files, then electroplates a genuine copper surface — not paint, not a print.
+> ${SITE_NAME_ALT} is run by Shay in ${BUSINESS_LOCATION_DISPLAY}. Upload your STL, OBJ, or 3MF — it is printed in UV resin, electroplated in real copper, and hand-finished. Worldwide shipping.
 
 ## What it is
 
-- One maker (atelier of one), not a factory or faceless shop
+- One person, not a print farm
 - UV resin print + real copper electroplating
-- Surface-forward finish: metallic sheen, looks like copper because it is copper, takes a patina as it ages
-- Careful turnaround by design — pieces are done one at a time
+- Genuine copper surface that takes a natural patina over time
+- Every file reviewed before anything is printed
 
 ## Finishes
 
-- Cosmetic copper — display cabinets and showcase pieces
-- Heavy-duty copper — tougher plated surface for regular table handling (durability, not weight)
+- Display Copper (AUD $45) — electroplated copper, polished to a metal shine
+- Thick Copper (AUD $80) — thicker copper plate for minis handled at the table
 
 ## Location
 
@@ -31,11 +31,12 @@ export function getLlmsTxt(): string {
 - Order: ${SITE_URL}/order
 - How it works: ${SITE_URL}/how-it-works
 - Returns and refunds: ${SITE_URL}/returns
+- Privacy: ${SITE_URL}/privacy
 - Gallery: ${SITE_URL}/gallery
 - Sitemap: ${SITE_URL}/sitemap.xml
 
 ## Contact and orders
 
-Customers upload their sculpt, choose a copper finish, and order online. Shay reviews every file before printing. Worldwide shipping is available. Custom work — not every file is accepted if unsuitable or obviously infringing.
+Customers upload their model, choose a copper finish, and order online. Shay reviews every file before printing. If a file can't be produced, the order is cancelled and refunded. Contact: metalmymini@gmail.com
 `;
 }

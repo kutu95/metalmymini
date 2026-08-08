@@ -74,8 +74,8 @@ export default function AdminGalleryPage() {
           </FormField>
           <FormField label="Finish type">
             <select name="finishType" className={selectClassName}>
-              <option value="cosmetic_copper">Cosmetic Copper Finish</option>
-              <option value="heavy_duty_copper">Heavy-Duty Copper Finish</option>
+              <option value="cosmetic_copper">Display Copper</option>
+              <option value="heavy_duty_copper">Thick Copper</option>
             </select>
           </FormField>
           <div className="md:col-span-2">

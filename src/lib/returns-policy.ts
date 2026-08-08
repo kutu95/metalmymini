@@ -1,67 +1,62 @@
 export const RETURN_POLICY_PATH = "/returns";
 
-export const RETURN_POLICY_EFFECTIVE_DATE = "2026-06-22";
+export const RETURN_POLICY_EFFECTIVE_DATE = "2026-08-08";
 
-export const SUPPORT_EMAIL = "support@metalmymini.com";
+export const SUPPORT_EMAIL = "metalmymini@gmail.com";
 
 export const RETURN_POLICY_INTRO = [
-  "At MetalMyMini, every miniature is produced specifically for each customer from files supplied by the customer. Because our products are custom manufactured, special conditions apply to returns and refunds.",
+  "Every miniature is made to order from the file you supply. Because each piece is custom-made, some specific conditions apply to returns and refunds — and nothing below affects your rights under the Australian Consumer Law.",
 ] as const;
 
 export const RETURN_POLICY_SECTIONS = [
   {
-    title: "Custom-Made Products",
+    title: "Custom-made products",
     paragraphs: [
-      "All miniatures, resin prints, and copper-plated miniatures are made to order.",
-      "Due to the customised nature of these products, we do not accept returns or provide refunds for:",
+      "All prints and copper-plated miniatures are made to order. Because they're customised, I can't offer returns or refunds for:",
     ],
     bullets: [
       "Change of mind",
-      "Incorrect file selection by the customer",
-      "Minor variations in appearance, finish, colour, or texture that are inherent to 3D printing and metal plating",
-      "Customer errors in uploaded files, dimensions, or specifications",
+      "The wrong file or options chosen at checkout",
+      "Minor variation in appearance, finish, colour, or texture that's a normal part of 3D printing and metal plating",
+      "Errors in the file, dimensions, or specifications you supplied",
     ],
   },
   {
-    title: "Damaged or Defective Products",
+    title: "Faulty or damaged items",
     paragraphs: [
-      "If your order arrives damaged or contains a manufacturing defect, please contact us within 14 days of delivery.",
-      "Please provide:",
+      "If your order arrives damaged or has a manufacturing fault, contact me as soon as you can — ideally within 14 days of delivery so I can sort it quickly. Your rights under the Australian Consumer Law aren't limited to that window.",
+      "Please include:",
     ],
     bullets: [
       "Your order number",
-      "A description of the issue",
-      "Clear photographs showing the problem",
+      "A description of the problem",
+      "Clear photos showing the issue",
     ],
     closing:
-      "We will assess the issue and may, at our discretion, reprint the item, replace the item, provide a partial refund, or provide a full refund.",
+      "I'll assess the item. For a minor fault, I'll repair or replace it. For a major fault, you choose a refund or a replacement — that choice is yours.",
   },
   {
-    title: "File Approval",
+    title: "File approval",
     paragraphs: [
-      "Where a design review or approval process is provided, customers are responsible for reviewing and approving any proofs, previews, or specifications before production begins.",
-      "Once production has commenced, orders cannot normally be cancelled.",
+      "Where a preview or proof is provided, it's your responsibility to review and approve it before production begins. Once production has started, orders generally can't be cancelled.",
     ],
   },
   {
-    title: "Lost or Damaged Shipments",
+    title: "Lost or damaged in transit",
     paragraphs: [
-      "If a shipment is lost in transit or arrives visibly damaged, please contact us as soon as possible.",
-      "We will work with the shipping carrier to investigate the issue and determine an appropriate resolution.",
+      "If a shipment is lost or arrives visibly damaged, contact me as soon as possible. I'll work with the carrier to investigate and find a resolution.",
     ],
   },
   {
-    title: "Order Cancellations",
+    title: "Cancellations",
     paragraphs: [
-      "Orders may be cancelled before production begins.",
-      "Once printing, finishing, plating, or packaging has commenced, cancellations are generally not possible because the product is being manufactured specifically for you.",
+      "Orders can be cancelled before production begins. Once printing, plating, finishing, or packing has started, cancellation generally isn't possible, because the piece is being made specifically for you. This covers change-of-mind cancellation and doesn't affect your rights if an item is faulty.",
     ],
   },
   {
     title: "Australian Consumer Law",
     paragraphs: [
-      "Nothing in this policy excludes, restricts, or modifies any rights or remedies available under the Australian Consumer Law.",
-      "Customers are entitled to a replacement, repair, or refund where required by Australian Consumer Law.",
+      "Nothing in this policy excludes, restricts, or modifies any right or remedy you have under the Australian Consumer Law. You're entitled to a repair, replacement, or refund where the ACL requires it.",
     ],
   },
 ] as const;

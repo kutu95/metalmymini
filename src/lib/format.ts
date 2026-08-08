@@ -19,7 +19,7 @@ export function formatDateTime(date: Date | string) {
 }
 
 export function productLabel(option: string) {
-  if (option === "cosmetic_copper") return "Cosmetic Copper Finish";
-  if (option === "heavy_duty_copper") return "Heavy-Duty Copper Finish";
+  if (option === "cosmetic_copper") return "Display Copper";
+  if (option === "heavy_duty_copper") return "Thick Copper";
   return option;
 }

@@ -6,7 +6,7 @@ import { createPageMetadata } from "@/lib/seo";
 export const metadata = createPageMetadata({
   title: "Gallery",
   description:
-    "Copper-plated tabletop minis I've finished for customers — real electroplated copper surfaces on custom sculpts.",
+    "Finished pieces from real orders. Each one is a customer's own model, printed and copper-plated here.",
   path: "/gallery",
 });
 
@@ -28,7 +28,7 @@ export default async function GalleryPage() {
     <div>
       <PageHeading
         title="Gallery"
-        subtitle="Finished copper-plated minis from orders I've completed."
+        subtitle="Finished pieces from real orders. Each one is a customer's own model, printed and copper-plated here."
       />
 
       {items.length === 0 ? (
@@ -46,13 +46,12 @@ export default async function GalleryPage() {
               />
               <div className="p-5">
                 <h2 className="text-lg font-medium text-stone-100">{item.title}</h2>
-                <p className="mt-1 text-sm text-copper-light">{productLabel(item.finishType)}</p>
+                <p className="mt-1 text-sm text-copper-light">
+                  {productLabel(item.finishType)} · Completed {formatDate(item.createdAt)}
+                </p>
                 {item.description && (
                   <p className="mt-3 text-sm leading-relaxed text-stone-400">{item.description}</p>
                 )}
-                <p className="mt-4 text-xs uppercase tracking-wide text-stone-500">
-                  Completed {formatDate(item.createdAt)}
-                </p>
               </div>
             </Card>
           ))}

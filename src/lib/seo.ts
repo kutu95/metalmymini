@@ -22,7 +22,7 @@ export const BUSINESS_LOCATION = {
 export const BUSINESS_LOCATION_DISPLAY = "Melbourne, Victoria, Australia";
 
 export const DEFAULT_DESCRIPTION =
-  "Upload your sculpt. I print in UV resin and electroplate a real copper surface — grey resin in, gleaming copper out. Solo maker in Melbourne. Worldwide shipping.";
+  "Upload your STL, OBJ, or 3MF and get it printed in resin and plated in real copper. One specialist, worldwide shipping.";
 
 export const FAQ_ITEMS = [
   {
@@ -33,21 +33,21 @@ export const FAQ_ITEMS = [
   {
     question: "What copper finish options are available?",
     answer:
-      "Cosmetic Copper Finish (AUD $55) is for display cabinets and showcase pieces — a real electroplated copper surface with the sheen. Heavy-Duty Copper Finish (AUD $80) is a tougher plate for minis you handle regularly at the table.",
+      "Display Copper (AUD $45) is a genuine copper surface, electroplated and polished to a metal shine. Thick Copper (AUD $80) is a thicker plate for minis you handle at the table.",
   },
   {
     question: "Is my model reviewed before production?",
     answer:
-      "Yes. I check every uploaded sculpt after payment for printability, size, and suitability for copper plating before I print.",
+      "Yes. I check every file after payment for printability, size, and how well it'll take copper before anything is printed.",
   },
   {
     question: "What happens if my file cannot be produced?",
     answer:
-      "If a file is unsuitable for production and cannot reasonably be corrected, the order may be cancelled and refunded.",
+      "If a file can't be produced and can't reasonably be fixed, I'll cancel and refund the order.",
   },
   {
     question: "Do you ship internationally?",
-    answer: "Yes. I ship completed miniatures worldwide with tracking when your order ships.",
+    answer: "Yes. Shipping is at cost, worldwide, with tracking added when the order ships.",
   },
   {
     question: "How do I track my order?",
@@ -57,7 +57,7 @@ export const FAQ_ITEMS = [
   {
     question: "What is your return and refund policy?",
     answer:
-      "Custom-made miniatures cannot be returned for change of mind. If your order arrives damaged or with a manufacturing defect, contact us within 14 days. See our Return and Refund Policy for full details.",
+      "Custom-made miniatures can't be returned for change of mind. If an item arrives damaged or faulty, contact me — ideally within 14 days. Your Australian Consumer Law rights aren't limited to that window. See the Refund Policy for full details.",
   },
 ] as const;
 
