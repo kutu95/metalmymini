@@ -132,6 +132,13 @@ model HeroImage {
   @@schema("metal")
 }
 
+model SiteSetting {
+  key   String @id
+  value String
+
+  @@schema("metal")
+}
+
 model OrderStatusHistory {
   id        String           @id @default(cuid())
   orderId   String

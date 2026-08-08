@@ -13,6 +13,7 @@ import {
 } from "@/lib/constants";
 import { formatDate, productLabel } from "@/lib/format";
 import { createPageMetadata, DEFAULT_DESCRIPTION, getHomeJsonLd } from "@/lib/seo";
+import { getHeroRotationMs } from "@/lib/site-settings";
 
 export const metadata = createPageMetadata({
   title: "Custom Copper-Plated Miniatures",
@@ -44,7 +45,11 @@ async function getGalleryPreview() {
 }
 
 export default async function HomePage() {
-  const [heroImages, gallery] = await Promise.all([getHeroImages(), getGalleryPreview()]);
+  const [heroImages, gallery, heroRotationMs] = await Promise.all([
+    getHeroImages(),
+    getGalleryPreview(),
+    getHeroRotationMs(),
+  ]);
 
   const heroSlides =
     heroImages.length > 0
@@ -84,7 +89,7 @@ export default async function HomePage() {
             </Button>
           </div>
         </div>
-        <HeroSlideshow images={heroSlides} />
+        <HeroSlideshow images={heroSlides} intervalMs={heroRotationMs} />
       </section>
 
       {/* Product — Finishes */}

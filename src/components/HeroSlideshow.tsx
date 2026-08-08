@@ -8,18 +8,22 @@ export type HeroSlide = {
   alt: string;
 };
 
-const ROTATION_MS = 2500;
-
-export function HeroSlideshow({ images }: { images: HeroSlide[] }) {
+export function HeroSlideshow({
+  images,
+  intervalMs = 2500,
+}: {
+  images: HeroSlide[];
+  intervalMs?: number;
+}) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
     if (images.length <= 1) return;
     const timer = setInterval(() => {
       setIndex((current) => (current + 1) % images.length);
-    }, ROTATION_MS);
+    }, intervalMs);
     return () => clearInterval(timer);
-  }, [images.length]);
+  }, [images.length, intervalMs]);
 
   if (images.length === 0) {
     return (

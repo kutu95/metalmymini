@@ -68,3 +68,7 @@ export const heroImageSchema = z.object({
   published: z.boolean(),
   sortOrder: z.number().int().min(0),
 });
+
+export const heroRotationSchema = z.object({
+  heroRotationSeconds: z.coerce.number().min(1).max(60),
+});

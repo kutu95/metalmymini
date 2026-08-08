@@ -17,6 +17,9 @@ export default function AdminHeroPage() {
   const [images, setImages] = useState<HeroImage[]>([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [rotationSeconds, setRotationSeconds] = useState(2.5);
+  const [rotationMessage, setRotationMessage] = useState("");
+  const [savingRotation, setSavingRotation] = useState(false);
 
   async function loadImages() {
     const response = await fetch("/api/hero-images?admin=1");
@@ -24,9 +27,37 @@ export default function AdminHeroPage() {
     setImages(data.images ?? []);
   }
 
+  async function loadSettings() {
+    const response = await fetch("/api/site-settings");
+    const data = await response.json();
+    if (typeof data.heroRotationSeconds === "number") {
+      setRotationSeconds(data.heroRotationSeconds);
+    }
+  }
+
   useEffect(() => {
     loadImages();
+    loadSettings();
   }, []);
+
+  async function saveRotation(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSavingRotation(true);
+    setRotationMessage("");
+    const response = await fetch("/api/site-settings", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ heroRotationSeconds: rotationSeconds }),
+    });
+    const data = await response.json();
+    setSavingRotation(false);
+    if (response.ok && typeof data.heroRotationSeconds === "number") {
+      setRotationSeconds(data.heroRotationSeconds);
+      setRotationMessage(`Slideshow will change every ${data.heroRotationSeconds} seconds.`);
+    } else {
+      setRotationMessage(data.error ?? "Unable to save slideshow timing");
+    }
+  }
 
   async function uploadImages(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -98,8 +129,31 @@ export default function AdminHeroPage() {
       </Link>
       <PageHeading
         title="Hero Images"
-        subtitle="Manage homepage hero images. Multiple images rotate every 2.5 seconds."
+        subtitle={`Manage homepage hero images. Multiple images rotate every ${rotationSeconds} seconds.`}
       />
+
+      <Card className="mb-8">
+        <form onSubmit={saveRotation} className="grid gap-4 md:grid-cols-[minmax(0,16rem)_auto] md:items-end">
+          <FormField
+            label="Seconds between images"
+            hint="How long each published hero image stays on the homepage before the next one."
+          >
+            <input
+              type="number"
+              min={1}
+              max={60}
+              step={0.5}
+              value={rotationSeconds}
+              onChange={(e) => setRotationSeconds(Number(e.target.value))}
+              className={inputClassName}
+            />
+          </FormField>
+          <Button type="submit" variant="secondary" disabled={savingRotation}>
+            {savingRotation ? "Saving..." : "Save timing"}
+          </Button>
+        </form>
+        {rotationMessage && <p className="mt-4 text-sm text-copper-light">{rotationMessage}</p>}
+      </Card>
 
       <Card className="mb-8">
         <form onSubmit={uploadImages} className="grid gap-4 md:grid-cols-2">
