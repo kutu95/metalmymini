@@ -31,9 +31,9 @@ export const FAQ_ITEMS = [
       "I accept STL, OBJ, and 3MF files. Models must be up to 100 mm in any dimension.",
   },
   {
-    question: "What copper finish options are available?",
+    question: "What copper finish do you offer?",
     answer:
-      "Display Copper (AUD $45) is a genuine copper surface, electroplated and polished to a metal shine. Thick Copper (AUD $80) is a thicker plate for minis you handle at the table.",
+      "Display Copper (AUD $45) — a genuine copper surface, electroplated over your print and polished to a metal shine. It looks like solid bronze and takes a natural patina over time.",
   },
   {
     question: "Is my model reviewed before production?",

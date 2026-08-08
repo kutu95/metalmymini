@@ -94,9 +94,9 @@ export default async function HomePage() {
 
       {/* Product — Finishes */}
       <section>
-        <h2 className="mb-2 text-2xl font-semibold text-stone-100">Finish options</h2>
+        <h2 className="mb-2 text-2xl font-semibold text-stone-100">The finish</h2>
         <p className="mb-8 max-w-2xl text-stone-400">
-          Display Copper for the cabinet. Thick Copper for the table.
+          One finish: Display Copper. Real copper on your print, polished to a metal shine.
         </p>
         <div className="grid gap-6 md:grid-cols-2">
           {Object.values(PRODUCTS).map((product) => (

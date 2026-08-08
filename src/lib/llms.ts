@@ -12,10 +12,9 @@ export function getLlmsTxt(): string {
 - Genuine copper surface that takes a natural patina over time
 - Every file reviewed before anything is printed
 
-## Finishes
+## Finish
 
 - Display Copper (AUD $45) — electroplated copper, polished to a metal shine
-- Thick Copper (AUD $80) — thicker copper plate for minis handled at the table
 
 ## Location
 
@@ -38,6 +37,6 @@ export function getLlmsTxt(): string {
 
 ## Contact and orders
 
-Customers upload their model, choose a copper finish, and order online. Shay reviews every file before printing. If a file can't be produced, the order is cancelled and refunded. Contact: metalmymini@gmail.com
+Customers upload their model and order Display Copper online. Shay reviews every file before printing. If a file can't be produced, the order is cancelled and refunded. Contact: metalmymini@gmail.com
 `;
 }

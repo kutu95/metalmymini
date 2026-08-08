@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button, Card, PageHeading } from "@/components/ui";
 import { productLabel } from "@/lib/format";
-import { FormField, inputClassName, selectClassName, textareaClassName } from "@/components/forms";
+import { FormField, inputClassName, textareaClassName } from "@/components/forms";
 
 type GalleryItem = {
   id: string;
@@ -72,12 +72,7 @@ export default function AdminGalleryPage() {
           <FormField label="Title">
             <input name="title" required className={inputClassName} />
           </FormField>
-          <FormField label="Finish type">
-            <select name="finishType" className={selectClassName}>
-              <option value="cosmetic_copper">Display Copper</option>
-              <option value="heavy_duty_copper">Thick Copper</option>
-            </select>
-          </FormField>
+          <input type="hidden" name="finishType" value="cosmetic_copper" />
           <div className="md:col-span-2">
             <FormField label="Description">
               <textarea name="description" rows={3} className={textareaClassName} />

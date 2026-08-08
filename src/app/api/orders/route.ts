@@ -62,10 +62,11 @@ export async function POST(request: NextRequest) {
       customerEmail: String(formData.get("customerEmail") ?? ""),
       shippingAddress: String(formData.get("shippingAddress") ?? ""),
       country: String(formData.get("country") ?? ""),
-      productOption: String(formData.get("productOption") ?? ""),
+      productOption: "cosmetic_copper",
       quantity: formData.get("quantity"),
       termsAccepted: formData.get("termsAccepted") === "true",
-      publicGalleryConsentAccepted: formData.get("publicGalleryConsentAccepted") === "true",
+      publicGalleryConsentAccepted: true,
+      customerNotes: String(formData.get("customerNotes") ?? "").trim() || undefined,
       createAccount: formData.get("createAccount") === "true",
       password: String(formData.get("password") ?? ""),
     };
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     const savedFile = await saveModelFile(file);
     const uploadedFile = await prisma.uploadedFile.create({ data: savedFile });
-    const { unitPrice, totalPrice } = calculateOrderTotal(parsed.data.productOption, parsed.data.quantity);
+    const { unitPrice, totalPrice } = calculateOrderTotal(parsed.data.quantity);
 
     const order = await prisma.order.create({
       data: {
@@ -109,13 +110,16 @@ export async function POST(request: NextRequest) {
         customerEmail: parsed.data.customerEmail,
         shippingAddress: parsed.data.shippingAddress,
         country: parsed.data.country,
-        productOption: parsed.data.productOption,
+        productOption: "cosmetic_copper",
         quantity: parsed.data.quantity,
         unitPrice,
         totalPrice,
         uploadedFileId: uploadedFile.id,
         termsAccepted: parsed.data.termsAccepted,
-        publicGalleryConsentAccepted: parsed.data.publicGalleryConsentAccepted,
+        publicGalleryConsentAccepted: true,
+        adminNotes: parsed.data.customerNotes
+          ? `Customer notes:\n${parsed.data.customerNotes}`
+          : undefined,
         paymentStatus: "unpaid",
         productionStatus: "submitted",
       },

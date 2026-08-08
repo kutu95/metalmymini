@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { ProductOption, ProductionStatus } from "@/generated/prisma/client";
+import { ProductionStatus } from "@/generated/prisma/client";
 import { PRODUCTS } from "@/lib/constants";
 
 export function generateOrderNumber() {
@@ -9,8 +9,8 @@ export function generateOrderNumber() {
   return `MMM-${date}-${rand}`;
 }
 
-export function calculateOrderTotal(productOption: ProductOption, quantity: number) {
-  const unitPrice = PRODUCTS[productOption].priceCents;
+export function calculateOrderTotal(quantity: number) {
+  const unitPrice = PRODUCTS.cosmetic_copper.priceCents;
   return { unitPrice, totalPrice: unitPrice * quantity };
 }
 

@@ -10,6 +10,8 @@ export const ABOUT_MAKER =
 export const WHY_METAL_MY_MINI =
   "It's one person, not a print farm. I review every file myself before it goes near the printer — if it won't plate cleanly, you get a revision or your money back. The gallery is real pieces from real orders, photographed as they shipped.";
 
+export const DEFAULT_PRODUCT_OPTION = "cosmetic_copper" satisfies ProductOption;
+
 export const PRODUCTS = {
   cosmetic_copper: {
     id: "cosmetic_copper" as const,
@@ -19,24 +21,7 @@ export const PRODUCTS = {
     priceCents: 4500,
     priceDisplay: "AUD $45",
   },
-  heavy_duty_copper: {
-    id: "heavy_duty_copper" as const,
-    name: "Thick Copper",
-    description:
-      "A thicker copper plate for minis you handle at the table — same metallic look, more copper on the surface.",
-    priceCents: 8000,
-    priceDisplay: "AUD $80",
-  },
-} satisfies Record<
-  ProductOption,
-  {
-    id: ProductOption;
-    name: string;
-    description: string;
-    priceCents: number;
-    priceDisplay: string;
-  }
->;
+} as const;
 
 export const ACCEPTED_FILE_TYPES = [".stl", ".obj", ".3mf"] as const;
 export const ACCEPTED_MIME_TYPES = [
@@ -104,7 +89,7 @@ export const LEGAL_CHECKOUT_TEXT = {
 
 export const PROCESS_STEPS = [
   { step: 1, title: "Upload your model", detail: "STL, OBJ, or 3MF — up to 100 mm" },
-  { step: 2, title: "Choose your finish", detail: "Display Copper or Thick Copper" },
+  { step: 2, title: "Display Copper", detail: "AUD $45 — electroplated copper, polished to a metal shine" },
   { step: 3, title: "Pay securely", detail: "Payment taken when you submit" },
   { step: 4, title: "File review", detail: "I check printability, size, and how well it'll take copper" },
   { step: 5, title: "Print, plate, finish", detail: "UV resin print, then real copper electroplating" },

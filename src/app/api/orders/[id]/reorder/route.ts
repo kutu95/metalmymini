@@ -27,9 +27,8 @@ export async function POST(
     }
 
     const body = await request.json();
-    const productOption = body.productOption ?? sourceOrder.productOption;
     const quantity = Number(body.quantity ?? 1);
-    const { unitPrice, totalPrice } = calculateOrderTotal(productOption, quantity);
+    const { unitPrice, totalPrice } = calculateOrderTotal(quantity);
 
     const reorderFile = await prisma.uploadedFile.create({
       data: {
@@ -49,13 +48,13 @@ export async function POST(
         customerEmail: sourceOrder.customerEmail,
         shippingAddress: sourceOrder.shippingAddress,
         country: sourceOrder.country,
-        productOption,
+        productOption: "cosmetic_copper",
         quantity,
         unitPrice,
         totalPrice,
         uploadedFileId: reorderFile.id,
         termsAccepted: true,
-        publicGalleryConsentAccepted: sourceOrder.publicGalleryConsentAccepted,
+        publicGalleryConsentAccepted: true,
         paymentStatus: "unpaid",
         productionStatus: "submitted",
       },

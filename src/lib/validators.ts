@@ -16,10 +16,11 @@ export const orderSchema = z.object({
   customerEmail: z.string().email(),
   shippingAddress: z.string().min(5),
   country: z.string().min(2),
-  productOption: z.enum(["cosmetic_copper", "heavy_duty_copper"]),
+  productOption: z.literal("cosmetic_copper").optional().default("cosmetic_copper"),
   quantity: z.coerce.number().int().min(1).max(99),
   termsAccepted: z.literal(true, { message: "You must accept the terms" }),
-  publicGalleryConsentAccepted: z.boolean(),
+  publicGalleryConsentAccepted: z.boolean().optional().default(true),
+  customerNotes: z.string().max(2000).optional(),
   createAccount: z.boolean().optional(),
   password: z.string().optional(),
 });

@@ -4,20 +4,19 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Card } from "@/components/ui";
 import { FormField, inputClassName, textareaClassName } from "@/components/forms";
-import { LEGAL_CHECKOUT_TEXT, PRODUCTS } from "@/lib/constants";
+import { DEFAULT_PRODUCT_OPTION, LEGAL_CHECKOUT_TEXT, PRODUCTS } from "@/lib/constants";
 import { formatAud } from "@/lib/format";
+
+const PRODUCT = PRODUCTS.cosmetic_copper;
 
 export function OrderForm() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [productOption, setProductOption] = useState<"cosmetic_copper" | "heavy_duty_copper">(
-    "cosmetic_copper",
-  );
   const [quantity, setQuantity] = useState(1);
   const [createAccount, setCreateAccount] = useState(false);
 
-  const unitPrice = PRODUCTS[productOption].priceCents;
+  const unitPrice = PRODUCT.priceCents;
   const totalPrice = unitPrice * quantity;
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -27,9 +26,9 @@ export function OrderForm() {
 
     const form = event.currentTarget;
     const formData = new FormData(form);
-    formData.set("productOption", productOption);
+    formData.set("productOption", DEFAULT_PRODUCT_OPTION);
     formData.set("termsAccepted", formData.get("termsAccepted") ? "true" : "false");
-    formData.set("publicGalleryConsentAccepted", formData.get("galleryOptOut") ? "false" : "true");
+    formData.set("publicGalleryConsentAccepted", "true");
     formData.set("createAccount", createAccount ? "true" : "false");
 
     try {
@@ -62,27 +61,10 @@ export function OrderForm() {
 
         <Card>
           <h2 className="text-lg font-medium text-stone-100">Finish and quantity</h2>
-          <div className="mt-4 space-y-3">
-            {Object.values(PRODUCTS).map((product) => (
-              <label
-                key={product.id}
-                className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 ${
-                  productOption === product.id ? "border-copper bg-copper/10" : "border-stone-700"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="productOptionChoice"
-                  checked={productOption === product.id}
-                  onChange={() => setProductOption(product.id)}
-                />
-                <span>
-                  <span className="block font-medium text-stone-100">{product.name}</span>
-                  <span className="block text-sm text-stone-400">{product.description}</span>
-                  <span className="mt-1 block text-sm text-copper-light">{product.priceDisplay}</span>
-                </span>
-              </label>
-            ))}
+          <div className="mt-4 rounded-lg border border-copper bg-copper/10 p-4">
+            <span className="block font-medium text-stone-100">{PRODUCT.name}</span>
+            <span className="mt-1 block text-sm text-stone-400">{PRODUCT.description}</span>
+            <span className="mt-1 block text-sm text-copper-light">{PRODUCT.priceDisplay}</span>
           </div>
           <div className="mt-4">
             <FormField label="Quantity">
@@ -116,6 +98,14 @@ export function OrderForm() {
             <div className="md:col-span-2">
               <FormField label="Shipping address">
                 <textarea name="shippingAddress" required rows={4} className={textareaClassName} />
+              </FormField>
+            </div>
+            <div className="md:col-span-2">
+              <FormField
+                label="Order notes (optional)"
+                hint="Anything I should know — including if you'd rather this piece stayed out of the gallery and marketing."
+              >
+                <textarea name="customerNotes" rows={3} className={textareaClassName} />
               </FormField>
             </div>
           </div>
@@ -157,10 +147,6 @@ export function OrderForm() {
               .
             </span>
           </label>
-          <label className="mt-3 flex items-start gap-3 text-sm text-stone-300">
-            <input name="galleryOptOut" type="checkbox" className="mt-1" />
-            Please don&apos;t publish photos of this piece in the gallery or marketing.
-          </label>
         </Card>
       </div>
 
@@ -169,7 +155,7 @@ export function OrderForm() {
           <h2 className="text-lg font-medium text-stone-100">Order summary</h2>
           <div className="mt-4 space-y-2 text-sm text-stone-400">
             <div className="flex justify-between">
-              <span>{PRODUCTS[productOption].name}</span>
+              <span>{PRODUCT.name}</span>
               <span>{formatAud(unitPrice)}</span>
             </div>
             <div className="flex justify-between">
