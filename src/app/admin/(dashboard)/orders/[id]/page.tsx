@@ -40,6 +40,7 @@ export default function AdminOrderDetailPage() {
     customerNotes: "",
     trackingNumber: "",
     statusNote: "",
+    printStartEmailSent: false,
   });
 
   useEffect(() => {
@@ -54,6 +55,7 @@ export default function AdminOrderDetailPage() {
           customerNotes: data.order.customerNotes ?? "",
           trackingNumber: data.order.trackingNumber ?? "",
           statusNote: "",
+          printStartEmailSent: false,
         });
       })
       .catch(() => setOrder(null));
@@ -110,7 +112,8 @@ export default function AdminOrderDetailPage() {
             </dl>
             <p className="mt-4 text-sm text-stone-400">{order.shippingAddress}</p>
             <p className="mt-4 text-sm text-stone-500">
-              Terms accepted: {order.termsAccepted ? "Yes" : "No"} · Gallery consent: {order.publicGalleryConsentAccepted ? "Yes" : "No"}
+              Terms accepted: {order.termsAccepted ? "Yes" : "No"} · Gallery photos allowed:{" "}
+              {order.publicGalleryConsentAccepted ? "Yes (default)" : "No — customer opted out"}
             </p>
             <a
               href={`/api/files/models/${order.uploadedFile.id}`}
@@ -170,6 +173,17 @@ export default function AdminOrderDetailPage() {
               <FormField label="Status change note">
                 <input value={form.statusNote} onChange={(e) => setForm({ ...form, statusNote: e.target.value })} className={inputClassName} />
               </FormField>
+              {form.productionStatus === "printing" && order.productionStatus !== "printing" ? (
+                <label className="flex items-start gap-3 text-sm text-stone-300">
+                  <input
+                    type="checkbox"
+                    checked={form.printStartEmailSent}
+                    onChange={(e) => setForm({ ...form, printStartEmailSent: e.target.checked })}
+                    className="mt-1"
+                  />
+                  I have emailed the customer that printing has started (cancellation cutoff under the Terms).
+                </label>
+              ) : null}
               <Button type="submit">Save changes</Button>
             </form>
           </Card>

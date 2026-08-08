@@ -52,6 +52,23 @@ export async function PATCH(
       return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
     }
 
+    const existing = await prisma.order.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    const movingToPrint =
+      parsed.data.productionStatus === "printing" && existing.productionStatus !== "printing";
+    if (movingToPrint && !parsed.data.printStartEmailSent) {
+      return NextResponse.json(
+        {
+          error:
+            "Send the print-start email first, then confirm it here. That email is the cancellation cutoff under the Terms.",
+        },
+        { status: 400 },
+      );
+    }
+
     const order = await prisma.order.update({
       where: { id },
       data: {

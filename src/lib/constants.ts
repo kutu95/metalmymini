@@ -97,7 +97,7 @@ export const LEGAL_CHECKOUT_TEXT = {
   review:
     "Each model is reviewed after payment. If a file can't be produced and can't reasonably be fixed, I'll cancel and refund the order.",
   gallery:
-    "By ordering, you agree completed work may be photographed for the Metal My Mini gallery.",
+    "By ordering, you agree photos of your finished piece may appear in the gallery, on the site, and in marketing. Tell us in your order notes or email metalmymini@gmail.com if you'd rather we didn't — no reason needed.",
   contact:
     "I may contact you if your model needs a change, clarification, or extra processing.",
 } as const;

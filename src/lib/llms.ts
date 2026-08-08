@@ -32,6 +32,7 @@ export function getLlmsTxt(): string {
 - How it works: ${SITE_URL}/how-it-works
 - Returns and refunds: ${SITE_URL}/returns
 - Privacy: ${SITE_URL}/privacy
+- Terms of Service: ${SITE_URL}/terms
 - Gallery: ${SITE_URL}/gallery
 - Sitemap: ${SITE_URL}/sitemap.xml
 

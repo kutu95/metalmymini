@@ -52,6 +52,7 @@ export const adminOrderUpdateSchema = z.object({
   customerNotes: z.string().optional(),
   trackingNumber: z.string().optional(),
   statusNote: z.string().optional(),
+  printStartEmailSent: z.boolean().optional(),
 });
 
 export const galleryItemSchema = z.object({

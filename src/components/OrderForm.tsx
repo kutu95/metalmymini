@@ -29,7 +29,7 @@ export function OrderForm() {
     const formData = new FormData(form);
     formData.set("productOption", productOption);
     formData.set("termsAccepted", formData.get("termsAccepted") ? "true" : "false");
-    formData.set("publicGalleryConsentAccepted", formData.get("galleryConsent") ? "true" : "false");
+    formData.set("publicGalleryConsentAccepted", formData.get("galleryOptOut") ? "false" : "true");
     formData.set("createAccount", createAccount ? "true" : "false");
 
     try {
@@ -149,11 +149,17 @@ export function OrderForm() {
           </div>
           <label className="mt-4 flex items-start gap-3 text-sm text-stone-300">
             <input name="termsAccepted" type="checkbox" required className="mt-1" />
-            I understand my file will be manually reviewed after payment and accept the order terms.
+            <span>
+              I confirm I am 18 or over, I have the rights to print this file, and I accept the{" "}
+              <a href="/terms" className="text-copper-light hover:underline">
+                Terms of Service
+              </a>
+              .
+            </span>
           </label>
           <label className="mt-3 flex items-start gap-3 text-sm text-stone-300">
-            <input name="galleryConsent" type="checkbox" className="mt-1" />
-            I agree completed work may appear in the public gallery and marketing.
+            <input name="galleryOptOut" type="checkbox" className="mt-1" />
+            Please don&apos;t publish photos of this piece in the gallery or marketing.
           </label>
         </Card>
       </div>

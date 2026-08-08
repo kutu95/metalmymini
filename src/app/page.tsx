@@ -182,12 +182,16 @@ export default async function HomePage() {
             See the{" "}
             <Link href="/returns" className="text-copper-light hover:underline">
               Refund Policy
-            </Link>{" "}
-            for cancellations, faulty items, and refunds. See the{" "}
+            </Link>
+            ,{" "}
             <Link href="/privacy" className="text-copper-light hover:underline">
               Privacy Policy
-            </Link>{" "}
-            for how I handle your personal information.
+            </Link>
+            , and{" "}
+            <Link href="/terms" className="text-copper-light hover:underline">
+              Terms of Service
+            </Link>
+            .
           </li>
         </ul>
         <div className="mt-8">
