@@ -133,7 +133,7 @@ export default function AdminHeroPage() {
       />
 
       <Card className="mb-8">
-        <form onSubmit={saveRotation} className="grid gap-4 md:grid-cols-[minmax(0,16rem)_auto] md:items-end">
+        <form onSubmit={saveRotation} className="max-w-xs space-y-4">
           <FormField
             label="Seconds between images"
             hint="How long each published hero image stays on the homepage before the next one."
