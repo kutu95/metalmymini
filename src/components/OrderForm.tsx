@@ -84,6 +84,7 @@ export function OrderForm() {
 
         <Card>
           <h2 className="text-lg font-medium text-stone-100">Shipping details</h2>
+          <p className="mt-2 text-sm text-stone-400">International shipping coming soon...</p>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <FormField label="Full name">
               <input name="customerName" required className={inputClassName} />

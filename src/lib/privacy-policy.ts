@@ -137,6 +137,14 @@ export const PRIVACY_POLICY_SECTIONS: PrivacySection[] = [
       },
       {
         type: "h3",
+        text: "If you subscribe for updates",
+      },
+      {
+        type: "p",
+        text: "If you use the website signup form, I store your email address, optional first name, where you signed up from (for example the footer), and when you subscribed. I use that only to send the updates you asked for.",
+      },
+      {
+        type: "h3",
         text: "Payments",
       },
       {
@@ -356,7 +364,7 @@ export const PRIVACY_POLICY_SECTIONS: PrivacySection[] = [
     blocks: [
       {
         type: "p",
-        text: "I don't currently send marketing emails. If that changes, it will be opt-in only, every email will have a working unsubscribe link, and I won't buy, sell or rent mailing lists.",
+        text: "You can opt in to occasional website updates (new finishes, gallery pieces, shipping news) using the signup form on the Site. That list is opt-in only. When I send those emails, every message will have a working unsubscribe link. I won't buy, sell or rent mailing lists.",
       },
       {
         type: "p",

@@ -139,6 +139,17 @@ model SiteSetting {
   @@schema("metal")
 }
 
+model EmailSubscriber {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  firstName      String?
+  source         String?
+  subscribedAt   DateTime  @default(now())
+  unsubscribedAt DateTime?
+
+  @@schema("metal")
+}
+
 model OrderStatusHistory {
   id        String           @id @default(cuid())
   orderId   String

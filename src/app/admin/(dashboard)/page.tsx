@@ -52,6 +52,9 @@ export default function AdminDashboardPage() {
           <Button href="/admin/gallery" variant="secondary">
             Gallery Manager
           </Button>
+          <Button href="/admin/subscribers" variant="secondary">
+            Subscribers
+          </Button>
         </div>
       </div>
 

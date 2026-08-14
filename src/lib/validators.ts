@@ -75,3 +75,9 @@ export const heroImageSchema = z.object({
 export const heroRotationSchema = z.object({
   heroRotationSeconds: z.coerce.number().min(1).max(60),
 });
+
+export const subscribeSchema = z.object({
+  email: z.string().email(),
+  firstName: z.string().trim().min(1).max(80).optional(),
+  source: z.enum(["footer", "home", "other"]).optional(),
+});

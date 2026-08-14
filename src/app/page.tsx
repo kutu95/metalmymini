@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Button, Card } from "@/components/ui";
 import { HeroSlideshow } from "@/components/HeroSlideshow";
+import { EmailSignupForm } from "@/components/EmailSignupForm";
 import { JsonLd } from "@/components/JsonLd";
 import {
   ABOUT_MAKER,
@@ -201,6 +202,17 @@ export default async function HomePage() {
         </ul>
         <div className="mt-8">
           <Button href="/order">Upload Your Mini</Button>
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-copper/15 bg-charcoal/50 p-8 md:p-10">
+        <h2 className="text-xl font-semibold text-stone-100">Stay informed</h2>
+        <p className="mt-3 max-w-xl text-stone-400">
+          Occasional updates when there&apos;s something worth knowing — new work in the gallery,
+          finish options, or when shipping expands.
+        </p>
+        <div className="mt-6 max-w-sm">
+          <EmailSignupForm source="home" buttonLabel="Keep me informed" />
         </div>
       </section>
     </div>
