@@ -86,6 +86,8 @@ model Order {
   adminNotes                   String?
   customerNotes                String?
   trackingNumber               String?
+  stripeCheckoutSessionId      String?              @unique
+  stripePaymentIntentId        String?
   createdAt                    DateTime             @default(now())
   updatedAt                    DateTime             @updatedAt
   statusHistory                OrderStatusHistory[]

@@ -142,11 +142,19 @@ Uploaded model files are stored in `storage/uploads/` (outside the public web ro
 
 ## Future integrations
 
-- **Stripe**: add checkout session in `/api/orders` and webhook handler
-- **Shipping**: replace placeholder shipping with rate calculation API
+- **Shipping**: Australia Post rate calculation at checkout
 - **STL analysis**: validate 100 mm bounding box on upload
+
+## Stripe
+
+Checkout uses Stripe Checkout Sessions. After deploy:
+
+1. Stripe Dashboard → Developers → Webhooks → Add endpoint
+2. URL: `https://YOUR_DOMAIN/api/payments/webhook`
+3. Events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`
+4. Copy the signing secret into `STRIPE_WEBHOOK_SECRET` on the server
+5. Set `ALLOW_DEV_PAYMENT=false` (or remove it) in production
 
 ## Product pricing
 
-- Cosmetic Copper Finish — AUD $55
-- Heavy-Duty Copper Finish — AUD $80
+- Display Copper — AUD $45

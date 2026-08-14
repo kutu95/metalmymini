@@ -4,17 +4,13 @@ import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui";
 import { inputClassName } from "@/components/forms";
 
-type EmailSignupFormProps = {
-  source: "footer" | "home" | "other";
-  buttonLabel?: string;
-  successMessage?: string;
-};
-
 export function EmailSignupForm({
   source,
   buttonLabel = "Notify me",
-  successMessage = "You're on the list.",
-}: EmailSignupFormProps) {
+}: {
+  source: "footer" | "home" | "other";
+  buttonLabel?: string;
+}) {
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
@@ -47,7 +43,22 @@ export function EmailSignupForm({
   }
 
   if (status === "success") {
-    return <p className="text-sm text-copper-light">{successMessage}</p>;
+    const heading = firstName.trim()
+      ? `Thanks, ${firstName.trim()} — you're subscribed.`
+      : "Thanks — you're subscribed.";
+
+    return (
+      <div
+        className="rounded-md border border-copper/30 bg-copper/10 px-4 py-3"
+        role="status"
+        aria-live="polite"
+      >
+        <p className="font-medium text-stone-100">{heading}</p>
+        <p className="mt-1 text-sm text-stone-400">
+          I&apos;ll be in touch when there&apos;s news worth sharing.
+        </p>
+      </div>
+    );
   }
 
   return (

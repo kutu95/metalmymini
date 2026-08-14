@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { addStatusHistory } from "@/lib/orders";
+import { markOrderPaid } from "@/lib/payments";
+import { isDevPaymentAllowed } from "@/lib/stripe";
 
-// Dev-only payment simulation. Stripe webhook handler will replace this flow.
+// Dev-only payment simulation. Prefer Stripe Checkout + webhook in real use.
 export async function POST(request: NextRequest) {
-  if (process.env.NODE_ENV === "production" && process.env.ALLOW_DEV_PAYMENT !== "true") {
+  if (process.env.NODE_ENV === "production" && !isDevPaymentAllowed()) {
     return NextResponse.json({ error: "Not available in production" }, { status: 403 });
   }
 
@@ -29,15 +30,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ order: failed });
   }
 
-  const updated = await prisma.order.update({
-    where: { id: orderId },
-    data: {
-      paymentStatus: "paid",
-      productionStatus: order.productionStatus === "submitted" ? "paid" : order.productionStatus,
-    },
+  const updated = await markOrderPaid({
+    orderId,
+    note: "Payment simulated (dev mode)",
   });
-
-  await addStatusHistory(updated.id, "paid", "Payment simulated (dev mode)");
 
   return NextResponse.json({ order: updated });
 }
