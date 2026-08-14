@@ -15,7 +15,9 @@ export const orderSchema = z.object({
   customerName: z.string().min(2),
   customerEmail: z.string().email(),
   shippingAddress: z.string().min(5),
-  country: z.string().min(2),
+  country: z.literal("Australia", {
+    message: "Shipping is currently available within Australia only",
+  }),
   productOption: z.literal("cosmetic_copper").optional().default("cosmetic_copper"),
   quantity: z.coerce.number().int().min(1).max(99),
   termsAccepted: z.literal(true, { message: "You must accept the terms" }),

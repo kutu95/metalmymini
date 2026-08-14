@@ -80,7 +80,7 @@ export default async function HomePage() {
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-stone-400">
             Upload your STL, OBJ, or 3MF. I print it in UV resin, electroplate it in real copper,
-            and hand-finish every piece myself. Worldwide shipping.
+            and hand-finish every piece myself. Shipping within Australia.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Button href="/order">Upload Your Mini</Button>

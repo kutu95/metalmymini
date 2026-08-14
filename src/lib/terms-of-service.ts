@@ -1,5 +1,6 @@
 export const TERMS_PATH = "/terms";
 export const TERMS_EFFECTIVE_DATE = "2026-08-08";
+export const TERMS_LAST_UPDATED_DATE = "2026-08-15";
 
 const TERMS_SITE_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "https://metalmymini.com").replace(
   /\/$/,
@@ -325,7 +326,7 @@ export const TERMS_SECTIONS: TermsSection[] = [
     blocks: [
       {
         type: "p",
-        text: "We ship within Australia and internationally, using a tracked service.",
+        text: "We currently ship within Australia only, using a tracked service.",
       },
       {
         type: "p",
@@ -337,11 +338,7 @@ export const TERMS_SECTIONS: TermsSection[] = [
       },
       {
         type: "p",
-        text: "International orders. Shipping cost and delivery timeframe vary by destination and are confirmed at checkout or by email before we begin. You are responsible for any customs duties, import taxes, and handling charges applied by your country — these aren't included in the price you pay us, and we can't tell you in advance what they'll be. If a parcel is refused, abandoned, or returned to us because those charges weren't paid, we'll refund you for the item, less our shipping and any return costs.",
-      },
-      {
-        type: "p",
-        text: "If we can't reliably ship to your destination, we'll tell you and refund you in full rather than send it and hope.",
+        text: "We don't currently accept international orders. If that changes, we'll update these Terms and the checkout options on the Site.",
       },
     ],
   },

@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { hashPassword } from "@/lib/auth";
 import { saveModelFile } from "@/lib/storage";
 import { addStatusHistory, calculateOrderTotal, generateOrderNumber } from "@/lib/orders";
+import { SHIPPING_COUNTRY } from "@/lib/constants";
 import { orderSchema, orderStatusLookupSchema } from "@/lib/validators";
 
 export async function GET(request: NextRequest) {
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
       customerName: String(formData.get("customerName") ?? ""),
       customerEmail: String(formData.get("customerEmail") ?? ""),
       shippingAddress: String(formData.get("shippingAddress") ?? ""),
-      country: String(formData.get("country") ?? ""),
+      country: SHIPPING_COUNTRY,
       productOption: "cosmetic_copper",
       quantity: formData.get("quantity"),
       termsAccepted: formData.get("termsAccepted") === "true",
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
         customerName: parsed.data.customerName,
         customerEmail: parsed.data.customerEmail,
         shippingAddress: parsed.data.shippingAddress,
-        country: parsed.data.country,
+        country: SHIPPING_COUNTRY,
         productOption: "cosmetic_copper",
         quantity: parsed.data.quantity,
         unitPrice,

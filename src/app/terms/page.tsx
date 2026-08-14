@@ -5,6 +5,7 @@ import { SITE_NAME, SITE_URL, createPageMetadata } from "@/lib/seo";
 import {
   TERMS_EFFECTIVE_DATE,
   TERMS_INTRO,
+  TERMS_LAST_UPDATED_DATE,
   TERMS_SECTIONS,
   getTermsPageJsonLd,
 } from "@/lib/terms-of-service";
@@ -25,7 +26,7 @@ export default function TermsPage() {
       <div>
         <PageHeading
           title="Terms of Service"
-          subtitle={`Effective date: ${formatEffectiveDate(TERMS_EFFECTIVE_DATE)} · Last updated: ${formatEffectiveDate(TERMS_EFFECTIVE_DATE)}`}
+          subtitle={`Effective date: ${formatEffectiveDate(TERMS_EFFECTIVE_DATE)} · Last updated: ${formatEffectiveDate(TERMS_LAST_UPDATED_DATE)}`}
         />
 
         <div className="space-y-6">

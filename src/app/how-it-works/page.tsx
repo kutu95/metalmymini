@@ -6,7 +6,7 @@ import Link from "next/link";
 export const metadata = createPageMetadata({
   title: "How It Works",
   description:
-    "Upload your STL, OBJ, or 3MF. I check the file, print it in resin, plate it in real copper, and ship worldwide.",
+    "Upload your STL, OBJ, or 3MF. I check the file, print it in resin, plate it in real copper, and ship within Australia.",
   path: "/how-it-works",
 });
 
@@ -58,7 +58,7 @@ export default function HowItWorksPage() {
           <h2 className="text-xl font-medium text-stone-100">4. Print, plate, ship</h2>
           <p className="mt-3 leading-relaxed text-stone-400">
             Approved orders are printed in UV resin, copper-plated, polished, and packed. Shipping
-            is at cost, worldwide, with tracking added when it ships.
+            is at cost within Australia, with tracking added when it ships.
           </p>
         </Card>
 

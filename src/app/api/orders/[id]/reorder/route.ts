@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { calculateOrderTotal, generateOrderNumber, addStatusHistory } from "@/lib/orders";
+import { SHIPPING_COUNTRY } from "@/lib/constants";
 
 export async function POST(
   request: NextRequest,
@@ -47,7 +48,7 @@ export async function POST(
         customerName: sourceOrder.customerName,
         customerEmail: sourceOrder.customerEmail,
         shippingAddress: sourceOrder.shippingAddress,
-        country: sourceOrder.country,
+        country: SHIPPING_COUNTRY,
         productOption: "cosmetic_copper",
         quantity,
         unitPrice,

@@ -12,6 +12,9 @@ export const WHY_METAL_MY_MINI =
 
 export const DEFAULT_PRODUCT_OPTION = "cosmetic_copper" satisfies ProductOption;
 
+/** Checkout ships within Australia only for now. */
+export const SHIPPING_COUNTRY = "Australia";
+
 export const PRODUCTS = {
   cosmetic_copper: {
     id: "cosmetic_copper" as const,
@@ -93,5 +96,5 @@ export const PROCESS_STEPS = [
   { step: 3, title: "Pay securely", detail: "Payment taken when you submit" },
   { step: 4, title: "File review", detail: "I check printability, size, and how well it'll take copper" },
   { step: 5, title: "Print, plate, finish", detail: "UV resin print, then real copper electroplating" },
-  { step: 6, title: "Ship worldwide", detail: "At cost, with tracking when it ships" },
+  { step: 6, title: "Ship within Australia", detail: "At cost, with tracking when it ships" },
 ] as const;

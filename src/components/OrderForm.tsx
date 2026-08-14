@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Card } from "@/components/ui";
 import { FormField, inputClassName, textareaClassName } from "@/components/forms";
-import { DEFAULT_PRODUCT_OPTION, LEGAL_CHECKOUT_TEXT, PRODUCTS } from "@/lib/constants";
+import { DEFAULT_PRODUCT_OPTION, LEGAL_CHECKOUT_TEXT, PRODUCTS, SHIPPING_COUNTRY } from "@/lib/constants";
 import { formatAud } from "@/lib/format";
 
 const PRODUCT = PRODUCTS.cosmetic_copper;
@@ -27,6 +27,7 @@ export function OrderForm() {
     const form = event.currentTarget;
     const formData = new FormData(form);
     formData.set("productOption", DEFAULT_PRODUCT_OPTION);
+    formData.set("country", SHIPPING_COUNTRY);
     formData.set("termsAccepted", formData.get("termsAccepted") ? "true" : "false");
     formData.set("publicGalleryConsentAccepted", "true");
     formData.set("createAccount", createAccount ? "true" : "false");
@@ -91,8 +92,16 @@ export function OrderForm() {
               <input name="customerEmail" type="email" required className={inputClassName} />
             </FormField>
             <div className="md:col-span-2">
-              <FormField label="Country">
-                <input name="country" required className={inputClassName} />
+              <FormField
+                label="Country"
+                hint="Shipping is within Australia only for now."
+              >
+                <input
+                  name="country"
+                  value={SHIPPING_COUNTRY}
+                  readOnly
+                  className={`${inputClassName} cursor-default text-stone-300`}
+                />
               </FormField>
             </div>
             <div className="md:col-span-2">

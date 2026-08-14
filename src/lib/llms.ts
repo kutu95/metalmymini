@@ -3,7 +3,7 @@ import { BUSINESS_LOCATION_DISPLAY, SITE_NAME, SITE_NAME_ALT, SITE_URL } from "@
 export function getLlmsTxt(): string {
   return `# ${SITE_NAME}
 
-> ${SITE_NAME_ALT} is run by Shay in ${BUSINESS_LOCATION_DISPLAY}. Upload your STL, OBJ, or 3MF — it is printed in UV resin, electroplated in real copper, and hand-finished. Worldwide shipping.
+> ${SITE_NAME_ALT} is run by Shay in ${BUSINESS_LOCATION_DISPLAY}. Upload your STL, OBJ, or 3MF — it is printed in UV resin, electroplated in real copper, and hand-finished. Shipping within Australia.
 
 ## What it is
 

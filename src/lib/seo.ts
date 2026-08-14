@@ -22,7 +22,7 @@ export const BUSINESS_LOCATION = {
 export const BUSINESS_LOCATION_DISPLAY = "Melbourne, Victoria, Australia";
 
 export const DEFAULT_DESCRIPTION =
-  "Upload your STL, OBJ, or 3MF and get it printed in resin and plated in real copper. One specialist, worldwide shipping.";
+  "Upload your STL, OBJ, or 3MF and get it printed in resin and plated in real copper. One specialist, shipping within Australia.";
 
 export const FAQ_ITEMS = [
   {
@@ -46,8 +46,9 @@ export const FAQ_ITEMS = [
       "If a file can't be produced and can't reasonably be fixed, I'll cancel and refund the order.",
   },
   {
-    question: "Do you ship internationally?",
-    answer: "Yes. Shipping is at cost, worldwide, with tracking added when the order ships.",
+    question: "Where do you ship?",
+    answer:
+      "Within Australia only for now, at cost, with tracking when the order ships. International shipping will come later.",
   },
   {
     question: "How do I track my order?",
