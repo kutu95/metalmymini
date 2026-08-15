@@ -15,6 +15,7 @@ async function getGalleryItems() {
     return await prisma.galleryItem.findMany({
       where: { published: true },
       orderBy: { createdAt: "desc" },
+      include: { product: { select: { name: true } } },
     });
   } catch {
     return [];
@@ -47,7 +48,7 @@ export default async function GalleryPage() {
               <div className="p-5">
                 <h2 className="text-lg font-medium text-stone-100">{item.title}</h2>
                 <p className="mt-1 text-sm text-copper-light">
-                  {productLabel(item.finishType)} · Completed {formatDate(item.createdAt)}
+                  {productLabel(item.product?.name)} · Completed {formatDate(item.createdAt)}
                 </p>
                 {item.description && (
                   <p className="mt-3 text-sm leading-relaxed text-stone-400">{item.description}</p>

@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button, Card, PageHeading, StatusBadge } from "@/components/ui";
 import { PAYMENT_STATUS_LABELS, PRODUCTION_STATUS_LABELS } from "@/lib/constants";
-import { formatAud, formatDateTime, productLabel } from "@/lib/format";
+import { formatAud, formatDateTime } from "@/lib/format";
 
 type Order = {
   id: string;
   orderNumber: string;
-  productOption: string;
+  productName: string;
   quantity: number;
   totalPrice: number;
   paymentStatus: keyof typeof PAYMENT_STATUS_LABELS;
@@ -56,7 +56,7 @@ export default function MyOrdersPage() {
               <div>
                 <h2 className="text-lg font-medium text-stone-100">{order.orderNumber}</h2>
                 <p className="mt-1 text-sm text-stone-400">
-                  {productLabel(order.productOption)} × {order.quantity} — {formatAud(order.totalPrice)}
+                  {order.productName} × {order.quantity} — {formatAud(order.totalPrice)}
                 </p>
                 <p className="mt-1 text-xs text-stone-500">{formatDateTime(order.createdAt)}</p>
               </div>

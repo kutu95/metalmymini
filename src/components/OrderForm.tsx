@@ -4,10 +4,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Card } from "@/components/ui";
 import { FormField, inputClassName, textareaClassName } from "@/components/forms";
-import { DEFAULT_PRODUCT_OPTION, LEGAL_CHECKOUT_TEXT, PRODUCTS, SHIPPING_COUNTRY } from "@/lib/constants";
+import { LEGAL_CHECKOUT_TEXT, SHIPPING_COUNTRY } from "@/lib/constants";
 import { formatAud } from "@/lib/format";
 
-const PRODUCT_BASE = PRODUCTS.cosmetic_copper;
+type CatalogProduct = {
+  id: string;
+  name: string;
+  description: string;
+  priceCents: number;
+  priceDisplay: string;
+  thumbnailUrl: string | null;
+};
 
 export function OrderForm() {
   const router = useRouter();
@@ -16,29 +23,26 @@ export function OrderForm() {
   const [quantity, setQuantity] = useState(1);
   const [postcode, setPostcode] = useState("");
   const [createAccount, setCreateAccount] = useState(false);
-  const [unitPrice, setUnitPrice] = useState(PRODUCT_BASE.priceCents);
-  const [priceDisplay, setPriceDisplay] = useState(PRODUCT_BASE.priceDisplay);
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [productId, setProductId] = useState("");
   const [shippingPrice, setShippingPrice] = useState<number | null>(null);
   const [shippingLabel, setShippingLabel] = useState("Enter postcode for quote");
   const [quoting, setQuoting] = useState(false);
 
+  const selected = products.find((p) => p.id === productId) ?? null;
+  const unitPrice = selected?.priceCents ?? 0;
   const productTotal = unitPrice * quantity;
   const totalPrice = productTotal + (shippingPrice ?? 0);
 
   useEffect(() => {
-    fetch("/api/site-settings")
+    fetch("/api/products")
       .then((r) => r.json())
       .then((data) => {
-        if (typeof data.displayCopperPriceCents === "number") {
-          setUnitPrice(data.displayCopperPriceCents);
-        }
-        if (typeof data.displayCopperPriceDisplay === "string") {
-          setPriceDisplay(data.displayCopperPriceDisplay);
-        }
+        const list = (data.products ?? []) as CatalogProduct[];
+        setProducts(list);
+        if (list[0]) setProductId(list[0].id);
       })
-      .catch(() => {
-        // Keep default price from constants if settings fail to load.
-      });
+      .catch(() => setError("Unable to load products"));
   }, []);
 
   useEffect(() => {
@@ -83,9 +87,15 @@ export function OrderForm() {
     setError("");
     setLoading(true);
 
+    if (!productId) {
+      setError("Select a product");
+      setLoading(false);
+      return;
+    }
+
     const form = event.currentTarget;
     const formData = new FormData(form);
-    formData.set("productOption", DEFAULT_PRODUCT_OPTION);
+    formData.set("productId", productId);
     formData.set("country", SHIPPING_COUNTRY);
     formData.set("shippingPostcode", postcode);
     formData.set("termsAccepted", formData.get("termsAccepted") ? "true" : "false");
@@ -122,11 +132,44 @@ export function OrderForm() {
 
         <Card>
           <h2 className="text-lg font-medium text-stone-100">Finish and quantity</h2>
-          <div className="mt-4 rounded-lg border border-copper bg-copper/10 p-4">
-            <span className="block font-medium text-stone-100">{PRODUCT_BASE.name}</span>
-            <span className="mt-1 block text-sm text-stone-400">{PRODUCT_BASE.description}</span>
-            <span className="mt-1 block text-sm text-copper-light">{priceDisplay}</span>
-          </div>
+          {products.length === 0 ? (
+            <p className="mt-4 text-sm text-stone-400">No finishes are available right now.</p>
+          ) : (
+            <div className="mt-4 grid gap-3">
+              {products.map((product) => {
+                const selectedCard = product.id === productId;
+                return (
+                  <button
+                    key={product.id}
+                    type="button"
+                    onClick={() => setProductId(product.id)}
+                    className={`flex gap-4 rounded-lg border p-3 text-left transition ${
+                      selectedCard
+                        ? "border-copper bg-copper/10"
+                        : "border-copper/20 bg-black/20 hover:border-copper/40"
+                    }`}
+                  >
+                    <div className="h-16 w-16 shrink-0 overflow-hidden rounded-md border border-copper/20 bg-stone-950">
+                      {product.thumbnailUrl ? (
+                        <img
+                          src={product.thumbnailUrl}
+                          alt=""
+                          className="h-full w-full object-cover"
+                        />
+                      ) : null}
+                    </div>
+                    <div className="min-w-0">
+                      <span className="block font-medium text-stone-100">{product.name}</span>
+                      <span className="mt-1 block text-sm text-stone-400 line-clamp-2">
+                        {product.description}
+                      </span>
+                      <span className="mt-1 block text-sm text-copper-light">{product.priceDisplay}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
           <div className="mt-4">
             <FormField label="Quantity">
               <input
@@ -153,10 +196,7 @@ export function OrderForm() {
               <input name="customerEmail" type="email" required className={inputClassName} />
             </FormField>
             <div className="md:col-span-2">
-              <FormField
-                label="Country"
-                hint="Shipping is within Australia only for now."
-              >
+              <FormField label="Country" hint="Shipping is within Australia only for now.">
                 <input
                   name="country"
                   value={SHIPPING_COUNTRY}
@@ -238,8 +278,8 @@ export function OrderForm() {
           <h2 className="text-lg font-medium text-stone-100">Order summary</h2>
           <div className="mt-4 space-y-2 text-sm text-stone-400">
             <div className="flex justify-between">
-              <span>{PRODUCT_BASE.name}</span>
-              <span>{formatAud(unitPrice)}</span>
+              <span>{selected?.name ?? "Finish"}</span>
+              <span>{selected ? formatAud(unitPrice) : "—"}</span>
             </div>
             <div className="flex justify-between">
               <span>Quantity</span>
@@ -260,11 +300,15 @@ export function OrderForm() {
           <div className="mt-4 flex justify-between border-t border-stone-700 pt-4 text-stone-100">
             <span className="font-medium">Total</span>
             <span className="font-medium">
-              {shippingPrice !== null ? formatAud(totalPrice) : formatAud(productTotal)}
+              {selected && shippingPrice !== null ? formatAud(totalPrice) : selected ? formatAud(productTotal) : "—"}
             </span>
           </div>
           {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
-          <Button type="submit" disabled={loading || shippingPrice === null || quoting} className="mt-6 w-full">
+          <Button
+            type="submit"
+            disabled={loading || !selected || shippingPrice === null || quoting}
+            className="mt-6 w-full"
+          >
             {loading ? "Submitting..." : "Submit Order"}
           </Button>
           <p className="mt-4 text-xs text-stone-500">

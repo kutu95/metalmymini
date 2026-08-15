@@ -15,13 +15,6 @@ enum Role {
   @@schema("metal")
 }
 
-enum ProductOption {
-  cosmetic_copper
-  heavy_duty_copper
-
-  @@schema("metal")
-}
-
 enum PaymentStatus {
   unpaid
   paid
@@ -63,6 +56,23 @@ model User {
   @@schema("metal")
 }
 
+model Product {
+  id            String        @id @default(cuid())
+  name          String
+  description   String        @default("")
+  priceCents    Int
+  active        Boolean       @default(true)
+  sortOrder     Int           @default(0)
+  galleryItemId String?       @unique
+  galleryItem   GalleryItem?  @relation("ProductThumbnail", fields: [galleryItemId], references: [id], onDelete: SetNull)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  orders        Order[]
+  galleryItems  GalleryItem[] @relation("GalleryProduct")
+
+  @@schema("metal")
+}
+
 model Order {
   id                           String               @id @default(cuid())
   orderNumber                  String               @unique
@@ -73,7 +83,9 @@ model Order {
   shippingAddress              String
   shippingPostcode             String?
   country                      String
-  productOption                ProductOption
+  productId                    String?
+  product                      Product?             @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productName                  String
   quantity                     Int
   unitPrice                    Int
   totalPrice                   Int
@@ -111,15 +123,17 @@ model UploadedFile {
 }
 
 model GalleryItem {
-  id             String        @id @default(cuid())
-  title          String
-  description    String?
-  finishType     ProductOption
-  imagePath      String
-  relatedOrderId String?
-  relatedOrder   Order?        @relation(fields: [relatedOrderId], references: [id])
-  published      Boolean       @default(false)
-  createdAt      DateTime      @default(now())
+  id               String    @id @default(cuid())
+  title            String
+  description      String?
+  productId        String?
+  product          Product?  @relation("GalleryProduct", fields: [productId], references: [id], onDelete: SetNull)
+  imagePath        String
+  relatedOrderId   String?
+  relatedOrder     Order?    @relation(fields: [relatedOrderId], references: [id])
+  published        Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  thumbnailFor     Product?  @relation("ProductThumbnail")
 
   @@schema("metal")
 }

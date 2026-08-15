@@ -22,7 +22,7 @@ export const orderSchema = z.object({
   country: z.literal("Australia", {
     message: "Shipping is currently available within Australia only",
   }),
-  productOption: z.literal("cosmetic_copper").optional().default("cosmetic_copper"),
+  productId: z.string().min(1, "Select a product"),
   quantity: z.coerce.number().int().min(1).max(99),
   termsAccepted: z.literal(true, { message: "You must accept the terms" }),
   publicGalleryConsentAccepted: z.boolean().optional().default(true),
@@ -73,7 +73,7 @@ export const adminOrderUpdateSchema = z.object({
 export const galleryItemSchema = z.object({
   title: z.string().min(2),
   description: z.string().optional(),
-  finishType: z.enum(["cosmetic_copper", "heavy_duty_copper"]),
+  productId: z.string().optional(),
   published: z.boolean(),
   relatedOrderId: z.string().optional(),
 });
@@ -88,8 +88,17 @@ export const heroRotationSchema = z.object({
   heroRotationSeconds: z.coerce.number().min(1).max(60),
 });
 
-export const displayCopperPriceSchema = z.object({
-  displayCopperPriceAud: z.coerce.number().min(1).max(5000),
+export const productSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  description: z.string().trim().max(1000).optional().default(""),
+  priceAud: z.coerce.number().min(1).max(5000),
+  active: z.boolean().optional().default(true),
+  sortOrder: z.coerce.number().int().min(0).max(9999).optional().default(0),
+  galleryItemId: z.string().nullable().optional(),
+});
+
+export const productUpdateSchema = productSchema.partial().extend({
+  active: z.boolean().optional(),
 });
 
 export const subscribeSchema = z.object({

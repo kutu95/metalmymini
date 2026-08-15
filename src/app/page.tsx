@@ -13,7 +13,8 @@ import {
 } from "@/lib/constants";
 import { formatDate, productLabel } from "@/lib/format";
 import { createPageMetadata, DEFAULT_DESCRIPTION, getHomeJsonLd } from "@/lib/seo";
-import { getDisplayCopperProduct, getHeroRotationMs } from "@/lib/site-settings";
+import { getHeroRotationMs } from "@/lib/site-settings";
+import { listProducts } from "@/lib/products";
 
 export const metadata = createPageMetadata({
   title: "Custom Copper-Plated Miniatures",
@@ -38,6 +39,7 @@ async function getGalleryPreview() {
       where: { published: true },
       orderBy: { createdAt: "desc" },
       take: 3,
+      include: { product: { select: { name: true } } },
     });
   } catch {
     return [];
@@ -45,11 +47,11 @@ async function getGalleryPreview() {
 }
 
 export default async function HomePage() {
-  const [heroImages, gallery, heroRotationMs, displayCopper] = await Promise.all([
+  const [heroImages, gallery, heroRotationMs, products] = await Promise.all([
     getHeroImages(),
     getGalleryPreview(),
     getHeroRotationMs(),
-    getDisplayCopperProduct(),
+    listProducts({ activeOnly: true }),
   ]);
 
   const heroSlides =
@@ -64,13 +66,13 @@ export default async function HomePage() {
   const productImages = [
     ...heroSlides.map((slide) => slide.src),
     ...gallery.map((item) => `/api/files/gallery/${item.imagePath}`),
+    ...products.filter((p) => p.thumbnailUrl).map((p) => p.thumbnailUrl as string),
   ];
 
   return (
     <>
-      <JsonLd data={getHomeJsonLd(productImages, displayCopper.priceCents)} />
+      <JsonLd data={getHomeJsonLd(productImages, products)} />
       <div className="space-y-20">
-      {/* 1. Product — Hero */}
       <section className="grid items-center gap-12 lg:grid-cols-2">
         <div>
           <p className="mb-3 text-sm uppercase tracking-[0.2em] text-copper-light">
@@ -93,22 +95,33 @@ export default async function HomePage() {
         <HeroSlideshow images={heroSlides} intervalMs={heroRotationMs} />
       </section>
 
-      {/* Product — Finishes */}
       <section>
         <h2 className="mb-2 text-2xl font-semibold text-stone-100">The finish</h2>
         <p className="mb-8 max-w-2xl text-stone-400">
-          One finish: Display Copper. Real copper on your print, polished to a metal shine.
+          {products.length <= 1
+            ? "Real metal on your print, polished to a shine."
+            : "Choose the finish that suits your piece."}
         </p>
         <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <p className="text-sm uppercase tracking-wide text-copper-light">{displayCopper.priceDisplay}</p>
-            <h3 className="mt-2 text-xl font-medium text-stone-100">{displayCopper.name}</h3>
-            <p className="mt-3 leading-relaxed text-stone-400">{displayCopper.description}</p>
-          </Card>
+          {products.map((product) => (
+            <Card key={product.id}>
+              {product.thumbnailUrl ? (
+                <img
+                  src={product.thumbnailUrl}
+                  alt={product.name}
+                  className="mb-4 aspect-square w-full rounded-md object-cover"
+                />
+              ) : null}
+              <p className="text-sm uppercase tracking-wide text-copper-light">{product.priceDisplay}</p>
+              <h3 className="mt-2 text-xl font-medium text-stone-100">{product.name}</h3>
+              {product.description ? (
+                <p className="mt-3 leading-relaxed text-stone-400">{product.description}</p>
+              ) : null}
+            </Card>
+          ))}
         </div>
       </section>
 
-      {/* 2. Results — Gallery */}
       <section>
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -138,7 +151,7 @@ export default async function HomePage() {
                 <div className="p-4">
                   <h3 className="font-medium text-stone-100">{item.title}</h3>
                   <p className="mt-1 text-sm text-stone-400">
-                    {productLabel(item.finishType)} · Completed {formatDate(item.createdAt)}
+                    {productLabel(item.product?.name)} · Completed {formatDate(item.createdAt)}
                   </p>
                 </div>
               </Card>
@@ -147,13 +160,11 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* Trust */}
       <section>
         <h2 className="mb-2 text-2xl font-semibold text-stone-100">Why Metal My Mini</h2>
         <p className="max-w-3xl leading-relaxed text-stone-400">{WHY_METAL_MY_MINI}</p>
       </section>
 
-      {/* 3. Process */}
       <section>
         <h2 className="mb-2 text-2xl font-semibold text-stone-100">How it works</h2>
         <p className="mb-8 text-stone-400">Every file is reviewed before anything is printed.</p>
@@ -162,24 +173,18 @@ export default async function HomePage() {
             <Card key={step.step}>
               <p className="text-sm text-copper-light">Step {step.step}</p>
               <h3 className="mt-2 font-medium text-stone-100">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-stone-400">
-                {step.step === 2
-                  ? `${displayCopper.priceDisplay} — ${step.detail.toLowerCase()}`
-                  : step.detail}
-              </p>
+              <p className="mt-2 text-sm leading-relaxed text-stone-400">{step.detail}</p>
             </Card>
           ))}
         </div>
       </section>
 
-      {/* 4. Person — compact About the Maker */}
       <section className="rounded-xl border border-copper/15 bg-charcoal/50 p-8 md:p-10">
         <h2 className="text-lg font-semibold text-stone-100">About the maker</h2>
         <p className="mt-4 max-w-3xl leading-relaxed text-stone-400">{ABOUT_MAKER}</p>
         <p className="mt-4 text-sm text-stone-500">— {FOUNDER.name}, Metal My Mini</p>
       </section>
 
-      {/* Order notes */}
       <section className="rounded-xl border border-copper/15 bg-charcoal/50 p-8 md:p-10">
         <h2 className="text-xl font-semibold text-stone-100">Before you order</h2>
         <ul className="mt-6 space-y-4 text-sm leading-relaxed text-stone-400">

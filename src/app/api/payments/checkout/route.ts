@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { productLabel } from "@/lib/format";
 import { getAppUrl, getStripe, isStripeConfigured } from "@/lib/stripe";
 
 const bodySchema = z.object({
@@ -26,7 +25,7 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     orderNumber: order.orderNumber,
-    productLabel: productLabel(order.productOption),
+    productLabel: order.productName,
     quantity: order.quantity,
     unitPrice: order.unitPrice,
     shippingPrice: order.shippingPrice ?? 0,
@@ -68,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     const stripe = getStripe();
     const appUrl = getAppUrl();
-    const label = productLabel(order.productOption);
+    const label = order.productName;
     const shippingPrice = order.shippingPrice ?? 0;
 
     const line_items: Array<{

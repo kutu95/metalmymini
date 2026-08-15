@@ -1,4 +1,4 @@
-import { ProductOption, ProductionStatus } from "@/generated/prisma/client";
+import { ProductionStatus } from "@/generated/prisma/client";
 
 export const FOUNDER = {
   name: "Shay",
@@ -10,21 +10,11 @@ export const ABOUT_MAKER =
 export const WHY_METAL_MY_MINI =
   "It's one person, not a print farm. I review every file myself before it goes near the printer — if it won't plate cleanly, you get a revision or your money back. The gallery is real pieces from real orders, photographed as they shipped.";
 
-export const DEFAULT_PRODUCT_OPTION = "cosmetic_copper" satisfies ProductOption;
-
 /** Checkout ships within Australia only for now. */
 export const SHIPPING_COUNTRY = "Australia";
 
-export const PRODUCTS = {
-  cosmetic_copper: {
-    id: "cosmetic_copper" as const,
-    name: "Display Copper",
-    description:
-      "A genuine copper surface, electroplated over your print and polished to a metal shine. Looks like solid bronze and takes a natural patina over time.",
-    priceCents: 4500,
-    priceDisplay: "AUD $45",
-  },
-} as const;
+export const DEFAULT_PRODUCT_DESCRIPTION =
+  "A genuine copper surface, electroplated over your print and polished to a metal shine. Looks like solid bronze and takes a natural patina over time.";
 
 export const ACCEPTED_FILE_TYPES = [".stl", ".obj", ".3mf"] as const;
 export const ACCEPTED_MIME_TYPES = [
@@ -40,7 +30,7 @@ export const ACCEPTED_MIME_TYPES = [
 ] as const;
 
 export const MAX_MODEL_DIMENSION_MM = 100;
-export const MIN_ORDER_CENTS = 4500;
+export const MIN_ORDER_CENTS = 100;
 
 export const PRODUCTION_STATUS_LABELS: Record<ProductionStatus, string> = {
   submitted: "Submitted",
@@ -92,7 +82,7 @@ export const LEGAL_CHECKOUT_TEXT = {
 
 export const PROCESS_STEPS = [
   { step: 1, title: "Upload your model", detail: "STL, OBJ, or 3MF — up to 100 mm" },
-  { step: 2, title: "Display Copper", detail: "Electroplated copper, polished to a metal shine" },
+  { step: 2, title: "Choose a finish", detail: "Electroplated metal finish, polished to a shine" },
   { step: 3, title: "Pay securely", detail: "Payment taken when you submit" },
   { step: 4, title: "File review", detail: "I check printability, size, and how well it'll take copper" },
   { step: 5, title: "Print, plate, finish", detail: "UV resin print, then real copper electroplating" },

@@ -6,12 +6,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Card, StatusBadge } from "@/components/ui";
 import { OrderTrackingView, type OrderTrackingData } from "@/components/OrderTrackingView";
 import { PAYMENT_STATUS_LABELS, PRODUCTION_STATUS_LABELS } from "@/lib/constants";
-import { formatAud, formatDateTime, productLabel } from "@/lib/format";
+import { formatAud, formatDateTime } from "@/lib/format";
 
 type OrderSummary = {
   id: string;
   orderNumber: string;
-  productOption: string;
+  productName: string;
   quantity: number;
   totalPrice: number;
   paymentStatus: keyof typeof PAYMENT_STATUS_LABELS;
@@ -230,7 +230,7 @@ export function OrderStatusLookup({ isLoggedIn }: OrderStatusLookupProps) {
                   <div>
                     <p className="font-medium text-stone-100">{order.orderNumber}</p>
                     <p className="mt-1 text-sm text-stone-400">
-                      {productLabel(order.productOption)} × {order.quantity} —{" "}
+                      {order.productName} × {order.quantity} —{" "}
                       {formatAud(order.totalPrice)}
                     </p>
                     <p className="mt-1 text-xs text-stone-500">{formatDateTime(order.createdAt)}</p>

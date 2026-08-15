@@ -18,8 +18,9 @@ export function formatDateTime(date: Date | string) {
   }).format(new Date(date));
 }
 
-export function productLabel(option: string) {
-  if (option === "cosmetic_copper") return "Display Copper";
-  if (option === "heavy_duty_copper") return "Thick Copper";
-  return option;
+export function productLabel(nameOrLegacy: string | null | undefined) {
+  if (!nameOrLegacy) return "Product";
+  if (nameOrLegacy === "cosmetic_copper") return "Display Copper";
+  if (nameOrLegacy === "heavy_duty_copper") return "Thick Copper";
+  return nameOrLegacy;
 }

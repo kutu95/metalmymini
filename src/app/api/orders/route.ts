@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       shippingAddress: String(formData.get("shippingAddress") ?? ""),
       shippingPostcode: String(formData.get("shippingPostcode") ?? ""),
       country: SHIPPING_COUNTRY,
-      productOption: "cosmetic_copper",
+      productId: String(formData.get("productId") ?? ""),
       quantity: formData.get("quantity"),
       termsAccepted: formData.get("termsAccepted") === "true",
       publicGalleryConsentAccepted: true,
@@ -102,9 +102,10 @@ export async function POST(request: NextRequest) {
 
     const savedFile = await saveModelFile(file);
     const uploadedFile = await prisma.uploadedFile.create({ data: savedFile });
-    const { unitPrice, shippingPrice, totalPrice } = await calculateOrderTotal(
+    const { product, unitPrice, shippingPrice, totalPrice } = await calculateOrderTotal(
       parsed.data.quantity,
       parsed.data.shippingPostcode,
+      parsed.data.productId,
     );
 
     const order = await prisma.order.create({
@@ -116,7 +117,8 @@ export async function POST(request: NextRequest) {
         shippingAddress: parsed.data.shippingAddress,
         shippingPostcode: parsed.data.shippingPostcode,
         country: SHIPPING_COUNTRY,
-        productOption: "cosmetic_copper",
+        productId: product.id,
+        productName: product.name,
         quantity: parsed.data.quantity,
         unitPrice,
         shippingPrice,

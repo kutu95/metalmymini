@@ -9,7 +9,10 @@ export async function GET(request: NextRequest) {
   if (adminView) {
     try {
       await requireAdmin();
-      const items = await prisma.galleryItem.findMany({ orderBy: { createdAt: "desc" } });
+      const items = await prisma.galleryItem.findMany({
+        orderBy: { createdAt: "desc" },
+        include: { product: { select: { id: true, name: true } } },
+      });
       return NextResponse.json({ items });
     } catch {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -19,6 +22,7 @@ export async function GET(request: NextRequest) {
   const items = await prisma.galleryItem.findMany({
     where: { published: true },
     orderBy: { createdAt: "desc" },
+    include: { product: { select: { id: true, name: true } } },
   });
   return NextResponse.json({ items });
 }
@@ -36,7 +40,7 @@ export async function POST(request: NextRequest) {
     const parsed = galleryItemSchema.safeParse({
       title: String(formData.get("title") ?? ""),
       description: String(formData.get("description") ?? "") || undefined,
-      finishType: String(formData.get("finishType") ?? ""),
+      productId: String(formData.get("productId") ?? "") || undefined,
       published: formData.get("published") === "true",
       relatedOrderId: String(formData.get("relatedOrderId") ?? "") || undefined,
     });
@@ -68,7 +72,7 @@ export async function PATCH(request: NextRequest) {
       data: {
         title: body.title,
         description: body.description,
-        finishType: body.finishType,
+        productId: body.productId || null,
         published: body.published,
       },
     });

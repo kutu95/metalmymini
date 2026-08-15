@@ -1,8 +1,17 @@
 import { BUSINESS_LOCATION_DISPLAY, SITE_NAME, SITE_NAME_ALT, SITE_URL } from "@/lib/seo";
-import { getDisplayCopperProduct } from "@/lib/site-settings";
+import { listProducts } from "@/lib/products";
 
 export async function getLlmsTxt(): Promise<string> {
-  const displayCopper = await getDisplayCopperProduct();
+  const products = await listProducts({ activeOnly: true });
+  const finishLines =
+    products.length > 0
+      ? products
+          .map(
+            (product) =>
+              `- ${product.name} (${product.priceDisplay}) — ${product.description || "metal finish"}`,
+          )
+          .join("\n")
+      : "- Finishes are listed on the order page";
 
   return `# ${SITE_NAME}
 
@@ -17,7 +26,7 @@ export async function getLlmsTxt(): Promise<string> {
 
 ## Finish
 
-- ${displayCopper.name} (${displayCopper.priceDisplay}) — electroplated copper, polished to a metal shine
+${finishLines}
 
 ## Location
 
@@ -40,6 +49,6 @@ export async function getLlmsTxt(): Promise<string> {
 
 ## Contact and orders
 
-Customers upload their model and order Display Copper online. Shay reviews every file before printing. If a file can't be produced, the order is cancelled and refunded. Contact: metalmymini@gmail.com
+Customers upload their model and choose a finish online. Shay reviews every file before printing. If a file can't be produced, the order is cancelled and refunded. Contact: metalmymini@gmail.com
 `;
 }

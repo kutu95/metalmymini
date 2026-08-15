@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { ProductionStatus } from "@/generated/prisma/client";
 import { quoteDomesticParcel } from "@/lib/auspost";
-import { getDisplayCopperPriceCents } from "@/lib/site-settings";
+import { getActiveProduct } from "@/lib/products";
 
 export function generateOrderNumber() {
   const now = new Date();
@@ -10,12 +10,18 @@ export function generateOrderNumber() {
   return `MMM-${date}-${rand}`;
 }
 
-export async function calculateOrderTotal(quantity: number, toPostcode: string) {
-  const unitPrice = await getDisplayCopperPriceCents();
+export async function calculateOrderTotal(quantity: number, toPostcode: string, productId: string) {
+  const product = await getActiveProduct(productId);
+  if (!product) {
+    throw new Error("Selected product is not available");
+  }
+
+  const unitPrice = product.priceCents;
   const productTotal = unitPrice * quantity;
   const shipping = await quoteDomesticParcel({ toPostcode, quantity });
 
   return {
+    product,
     unitPrice,
     productTotal,
     shippingPrice: shipping.amountCents,

@@ -27,8 +27,8 @@ export async function POST(
     const item = await prisma.galleryItem.create({
       data: {
         title: `${order.orderNumber} — Finished Mini`,
-        description: `Completed ${order.productOption.replace("_", " ")} miniature`,
-        finishType: order.productOption,
+        description: `Completed ${order.productName} miniature`,
+        productId: order.productId,
         imagePath: saved.storedFilename,
         relatedOrderId: order.id,
         published: publish,

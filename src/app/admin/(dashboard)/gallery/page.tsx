@@ -3,20 +3,27 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button, Card, PageHeading } from "@/components/ui";
-import { productLabel } from "@/lib/format";
 import { FormField, inputClassName, textareaClassName } from "@/components/forms";
 
 type GalleryItem = {
   id: string;
   title: string;
   description?: string | null;
-  finishType: string;
+  productId?: string | null;
+  product?: { name: string } | null;
   imagePath: string;
   published: boolean;
 };
 
+type ProductOption = {
+  id: string;
+  name: string;
+  active?: boolean;
+};
+
 export default function AdminGalleryPage() {
   const [items, setItems] = useState<GalleryItem[]>([]);
+  const [products, setProducts] = useState<ProductOption[]>([]);
   const [message, setMessage] = useState("");
 
   async function loadItems() {
@@ -25,8 +32,15 @@ export default function AdminGalleryPage() {
     setItems(data.items ?? []);
   }
 
+  async function loadProducts() {
+    const response = await fetch("/api/products?admin=1");
+    const data = await response.json();
+    if (response.ok) setProducts(data.products ?? []);
+  }
+
   useEffect(() => {
     loadItems();
+    loadProducts();
   }, []);
 
   async function createItem(event: React.FormEvent<HTMLFormElement>) {
@@ -72,7 +86,17 @@ export default function AdminGalleryPage() {
           <FormField label="Title">
             <input name="title" required className={inputClassName} />
           </FormField>
-          <input type="hidden" name="finishType" value="cosmetic_copper" />
+          <FormField label="Product (optional)">
+            <select name="productId" className={inputClassName} defaultValue="">
+              <option value="">No product link</option>
+              {products.map((product) => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                  {product.active === false ? " (inactive)" : ""}
+                </option>
+              ))}
+            </select>
+          </FormField>
           <div className="md:col-span-2">
             <FormField label="Description">
               <textarea name="description" rows={3} className={textareaClassName} />
@@ -98,7 +122,9 @@ export default function AdminGalleryPage() {
             <img src={`/api/files/gallery/${item.imagePath}`} alt={item.title} className="aspect-square w-full object-cover" />
             <div className="p-4">
               <h2 className="font-medium text-stone-100">{item.title}</h2>
-              <p className="text-sm text-stone-400">{productLabel(item.finishType)}</p>
+              <p className="text-sm text-stone-400">
+                {item.product?.name ?? (item.productId ? "Product linked" : "No product")}
+              </p>
               <div className="mt-4 flex gap-2">
                 <Button variant="secondary" onClick={() => togglePublish(item)}>
                   {item.published ? "Unpublish" : "Publish"}

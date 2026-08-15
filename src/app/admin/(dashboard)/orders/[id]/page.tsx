@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button, Card, PageHeading, StatusBadge } from "@/components/ui";
 import { PRODUCTION_STATUS_LABELS, PAYMENT_STATUS_LABELS } from "@/lib/constants";
-import { formatAud, formatDateTime, productLabel } from "@/lib/format";
+import { formatAud, formatDateTime } from "@/lib/format";
 import { FormField, inputClassName, selectClassName, textareaClassName } from "@/components/forms";
 
 type OrderDetail = {
@@ -16,7 +16,7 @@ type OrderDetail = {
   shippingAddress: string;
   shippingPostcode?: string | null;
   country: string;
-  productOption: string;
+  productName: string;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
@@ -133,7 +133,7 @@ export default function AdminOrderDetailPage() {
               />
             </div>
             <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
-              <div><dt className="text-stone-500">Product</dt><dd>{productLabel(order.productOption)}</dd></div>
+              <div><dt className="text-stone-500">Product</dt><dd>{order.productName}</dd></div>
               <div><dt className="text-stone-500">Quantity</dt><dd>{order.quantity}</dd></div>
               <div><dt className="text-stone-500">Product total</dt><dd>{formatAud(order.unitPrice * order.quantity)}</dd></div>
               <div>

@@ -27,6 +27,13 @@ export async function POST(
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
+    if (!sourceOrder.productId) {
+      return NextResponse.json(
+        { error: "Original product is no longer available — place a new order" },
+        { status: 400 },
+      );
+    }
+
     const body = await request.json();
     const quantity = Number(body.quantity ?? 1);
     const postcode =
@@ -38,7 +45,11 @@ export async function POST(
       );
     }
 
-    const { unitPrice, shippingPrice, totalPrice } = await calculateOrderTotal(quantity, postcode);
+    const { product, unitPrice, shippingPrice, totalPrice } = await calculateOrderTotal(
+      quantity,
+      postcode,
+      sourceOrder.productId,
+    );
 
     const reorderFile = await prisma.uploadedFile.create({
       data: {
@@ -59,7 +70,8 @@ export async function POST(
         shippingAddress: sourceOrder.shippingAddress,
         shippingPostcode: postcode,
         country: SHIPPING_COUNTRY,
-        productOption: "cosmetic_copper",
+        productId: product.id,
+        productName: product.name,
         quantity,
         unitPrice,
         shippingPrice,
@@ -75,7 +87,8 @@ export async function POST(
     await addStatusHistory(order.id, "submitted", "Reorder from stored file");
 
     return NextResponse.json({ orderId: order.id, orderNumber: order.orderNumber, totalPrice });
-  } catch {
-    return NextResponse.json({ error: "Unable to reorder" }, { status: 500 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unable to reorder";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
