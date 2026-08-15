@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Card } from "@/components/ui";
 import { FormField, inputClassName, textareaClassName } from "@/components/forms";
+import { ModelPreview } from "@/components/ModelPreview";
 import { LEGAL_CHECKOUT_TEXT, MAX_LINE_QUANTITY, MAX_ORDER_FILES, SHIPPING_COUNTRY } from "@/lib/constants";
 import { formatAud } from "@/lib/format";
 
@@ -11,10 +12,11 @@ type ModelLine = {
   id: string;
   quantity: number;
   fileName: string;
+  file: File | null;
 };
 
 function newModelLine(): ModelLine {
-  return { id: crypto.randomUUID(), quantity: 1, fileName: "" };
+  return { id: crypto.randomUUID(), quantity: 1, fileName: "", file: null };
 }
 
 type CatalogProduct = {
@@ -135,54 +137,59 @@ export function OrderForm() {
           </p>
           <div className="mt-4 space-y-4">
             {lines.map((line, index) => (
-              <div key={line.id} className="grid gap-3 md:grid-cols-[1fr_7rem_auto]">
-                <FormField
-                  label={index === 0 ? "Upload STL, OBJ, or 3MF" : `Model ${index + 1}`}
-                  hint={index === 0 ? "Up to 100 mm in any dimension. Reviewed before production." : undefined}
-                >
-                  <input
-                    name={`modelFile_${index}`}
-                    type="file"
-                    required
-                    accept=".stl,.obj,.3mf"
-                    className={inputClassName}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      setLines((current) =>
-                        current.map((item) =>
-                          item.id === line.id ? { ...item, fileName: file?.name ?? "" } : item,
-                        ),
-                      );
-                    }}
-                  />
-                </FormField>
-                <FormField label="Qty">
-                  <input
-                    name={`quantity_${index}`}
-                    type="number"
-                    min={1}
-                    max={MAX_LINE_QUANTITY}
-                    value={line.quantity}
-                    onChange={(e) => {
-                      const quantity = Math.min(MAX_LINE_QUANTITY, Math.max(1, Number(e.target.value) || 1));
-                      setLines((current) =>
-                        current.map((item) => (item.id === line.id ? { ...item, quantity } : item)),
-                      );
-                    }}
-                    className={inputClassName}
-                  />
-                </FormField>
-                {lines.length > 1 ? (
-                  <button
-                    type="button"
-                    className="self-end pb-2 text-sm text-stone-400 hover:text-stone-200"
-                    onClick={() => setLines((current) => current.filter((item) => item.id !== line.id))}
+              <div key={line.id} className="space-y-0">
+                <div className="grid gap-3 md:grid-cols-[1fr_7rem_auto]">
+                  <FormField
+                    label={index === 0 ? "Upload STL, OBJ, or 3MF" : `Model ${index + 1}`}
+                    hint={index === 0 ? "Up to 100 mm in any dimension. Reviewed before production." : undefined}
                   >
-                    Remove
-                  </button>
-                ) : (
-                  <span className="hidden md:block" />
-                )}
+                    <input
+                      name={`modelFile_${index}`}
+                      type="file"
+                      required
+                      accept=".stl,.obj,.3mf"
+                      className={inputClassName}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] ?? null;
+                        setLines((current) =>
+                          current.map((item) =>
+                            item.id === line.id
+                              ? { ...item, file, fileName: file?.name ?? "" }
+                              : item,
+                          ),
+                        );
+                      }}
+                    />
+                  </FormField>
+                  <FormField label="Qty">
+                    <input
+                      name={`quantity_${index}`}
+                      type="number"
+                      min={1}
+                      max={MAX_LINE_QUANTITY}
+                      value={line.quantity}
+                      onChange={(e) => {
+                        const quantity = Math.min(MAX_LINE_QUANTITY, Math.max(1, Number(e.target.value) || 1));
+                        setLines((current) =>
+                          current.map((item) => (item.id === line.id ? { ...item, quantity } : item)),
+                        );
+                      }}
+                      className={inputClassName}
+                    />
+                  </FormField>
+                  {lines.length > 1 ? (
+                    <button
+                      type="button"
+                      className="self-end pb-2 text-sm text-stone-400 hover:text-stone-200"
+                      onClick={() => setLines((current) => current.filter((item) => item.id !== line.id))}
+                    >
+                      Remove
+                    </button>
+                  ) : (
+                    <span className="hidden md:block" />
+                  )}
+                </div>
+                {line.file ? <ModelPreview file={line.file} /> : null}
               </div>
             ))}
           </div>
