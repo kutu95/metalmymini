@@ -1,7 +1,14 @@
 import { prisma } from "@/lib/db";
-import { ProductionStatus } from "@/generated/prisma/client";
+import { Prisma, ProductionStatus } from "@/generated/prisma/client";
 import { quoteDomesticParcel } from "@/lib/auspost";
 import { getActiveProduct } from "@/lib/products";
+
+export const orderItemsInclude = {
+  items: {
+    orderBy: { sortOrder: "asc" as const },
+    include: { uploadedFile: true },
+  },
+} satisfies Prisma.OrderInclude;
 
 export function generateOrderNumber() {
   const now = new Date();

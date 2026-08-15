@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MAX_LINE_QUANTITY, MAX_ORDER_FILES } from "@/lib/constants";
 
 export const signupSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -23,7 +24,6 @@ export const orderSchema = z.object({
     message: "Shipping is currently available within Australia only",
   }),
   productId: z.string().min(1, "Select a product"),
-  quantity: z.coerce.number().int().min(1).max(99),
   termsAccepted: z.literal(true, { message: "You must accept the terms" }),
   publicGalleryConsentAccepted: z.boolean().optional().default(true),
   customerNotes: z.string().max(2000).optional(),
@@ -36,7 +36,7 @@ export const shippingQuoteSchema = z.object({
     .string()
     .trim()
     .regex(/^\d{4}$/, "Enter a valid 4-digit Australian postcode"),
-  quantity: z.coerce.number().int().min(1).max(99).default(1),
+  quantity: z.coerce.number().int().min(1).max(MAX_ORDER_FILES * MAX_LINE_QUANTITY).default(1),
 });
 
 export const orderStatusLookupSchema = z.object({
@@ -100,6 +100,29 @@ export const productSchema = z.object({
 export const productUpdateSchema = productSchema.partial().extend({
   active: z.boolean().optional(),
 });
+
+export const orderLineQuantitySchema = z.coerce.number().int().min(1).max(MAX_LINE_QUANTITY);
+
+export function parseOrderModelLines(formData: FormData) {
+  const lines: { file: File; quantity: number }[] = [];
+
+  for (let i = 0; i < MAX_ORDER_FILES; i++) {
+    const file = formData.get(`modelFile_${i}`);
+    if (!(file instanceof File) || file.size === 0) continue;
+
+    const quantity = orderLineQuantitySchema.safeParse(formData.get(`quantity_${i}`) ?? 1);
+    if (!quantity.success) {
+      throw new Error(`Quantity for ${file.name || `file ${i + 1}`} must be between 1 and ${MAX_LINE_QUANTITY}`);
+    }
+    lines.push({ file, quantity: quantity.data });
+  }
+
+  if (lines.length === 0) {
+    throw new Error("At least one model file is required");
+  }
+
+  return lines;
+}
 
 export const subscribeSchema = z.object({
   email: z.string().email(),

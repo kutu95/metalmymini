@@ -6,6 +6,11 @@ import { Button, Card, PageHeading, StatusBadge } from "@/components/ui";
 import { PRODUCTION_STATUS_LABELS, PAYMENT_STATUS_LABELS } from "@/lib/constants";
 import { formatAud, formatDateTime } from "@/lib/format";
 
+type OrderItem = {
+  quantity: number;
+  uploadedFile: { originalFilename: string };
+};
+
 type Order = {
   id: string;
   orderNumber: string;
@@ -15,7 +20,7 @@ type Order = {
   paymentStatus: keyof typeof PAYMENT_STATUS_LABELS;
   totalPrice: number;
   createdAt: string;
-  uploadedFile: { originalFilename: string };
+  items?: OrderItem[];
 };
 
 export default function AdminDashboardPage() {
@@ -33,11 +38,12 @@ export default function AdminDashboardPage() {
   const filtered = orders.filter((order) => {
     const matchesStatus = !filter || order.productionStatus === filter;
     const q = search.toLowerCase();
+    const filenames = (order.items ?? []).map((item) => item.uploadedFile.originalFilename.toLowerCase());
     const matchesSearch =
       !q ||
       order.orderNumber.toLowerCase().includes(q) ||
       order.customerEmail.toLowerCase().includes(q) ||
-      order.uploadedFile.originalFilename.toLowerCase().includes(q);
+      filenames.some((name) => name.includes(q));
     return matchesStatus && matchesSearch;
   });
 
@@ -96,7 +102,10 @@ export default function AdminDashboardPage() {
                   {order.customerName} — {order.customerEmail}
                 </p>
                 <p className="mt-1 text-xs text-stone-500">
-                  {order.uploadedFile.originalFilename} · {formatDateTime(order.createdAt)} · {formatAud(order.totalPrice)}
+                  {(order.items ?? [])
+                    .map((item) => `${item.uploadedFile.originalFilename} × ${item.quantity}`)
+                    .join(", ") || "No files"}{" "}
+                  · {formatDateTime(order.createdAt)} · {formatAud(order.totalPrice)}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">

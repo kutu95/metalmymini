@@ -28,7 +28,11 @@ type OrderDetail = {
   adminNotes?: string | null;
   customerNotes?: string | null;
   trackingNumber?: string | null;
-  uploadedFile?: { id: string; originalFilename: string } | null;
+  items?: Array<{
+    id: string;
+    quantity: number;
+    uploadedFile: { id: string; originalFilename: string };
+  }>;
   statusHistory?: Array<{ status: string; note?: string | null; createdAt: string }>;
 };
 
@@ -87,7 +91,7 @@ export default function AdminOrderDetailPage() {
       return {
         ...current,
         ...data.order,
-        uploadedFile: data.order.uploadedFile ?? current.uploadedFile,
+        items: data.order.items ?? current.items,
         statusHistory: data.order.statusHistory ?? current.statusHistory,
       };
     });
@@ -134,7 +138,7 @@ export default function AdminOrderDetailPage() {
             </div>
             <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
               <div><dt className="text-stone-500">Product</dt><dd>{order.productName}</dd></div>
-              <div><dt className="text-stone-500">Quantity</dt><dd>{order.quantity}</dd></div>
+              <div><dt className="text-stone-500">Minis</dt><dd>{order.quantity}</dd></div>
               <div><dt className="text-stone-500">Product total</dt><dd>{formatAud(order.unitPrice * order.quantity)}</dd></div>
               <div>
                 <dt className="text-stone-500">Shipping</dt>
@@ -152,15 +156,22 @@ export default function AdminOrderDetailPage() {
               Terms accepted: {order.termsAccepted ? "Yes" : "No"} · Gallery photos allowed:{" "}
               {order.publicGalleryConsentAccepted ? "Yes (default)" : "No — customer opted out"}
             </p>
-            {order.uploadedFile ? (
-              <a
-                href={`/api/files/models/${order.uploadedFile.id}`}
-                className="mt-4 inline-block text-sm text-copper-light hover:underline"
-              >
-                Download {order.uploadedFile.originalFilename}
-              </a>
+            {order.items && order.items.length > 0 ? (
+              <ul className="mt-4 space-y-1 text-sm">
+                {order.items.map((item) => (
+                  <li key={item.id}>
+                    <a
+                      href={`/api/files/models/${item.uploadedFile.id}`}
+                      className="text-copper-light hover:underline"
+                    >
+                      Download {item.uploadedFile.originalFilename}
+                    </a>
+                    <span className="text-stone-500"> × {item.quantity}</span>
+                  </li>
+                ))}
+              </ul>
             ) : (
-              <p className="mt-4 text-sm text-amber-300">Model file is missing for this order.</p>
+              <p className="mt-4 text-sm text-amber-300">Model files are missing for this order.</p>
             )}
           </Card>
 

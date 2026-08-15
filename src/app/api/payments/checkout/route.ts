@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { orderItemsInclude } from "@/lib/orders";
 import { getAppUrl, getStripe, isStripeConfigured } from "@/lib/stripe";
 
 const bodySchema = z.object({
@@ -18,6 +19,7 @@ export async function GET(request: NextRequest) {
 
   const order = await prisma.order.findFirst({
     where: { id: parsed.data.orderId, orderNumber: parsed.data.orderNumber },
+    include: orderItemsInclude,
   });
   if (!order) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
@@ -31,6 +33,10 @@ export async function GET(request: NextRequest) {
     shippingPrice: order.shippingPrice ?? 0,
     totalPrice: order.totalPrice,
     paymentStatus: order.paymentStatus,
+    items: order.items.map((item) => ({
+      filename: item.uploadedFile.originalFilename,
+      quantity: item.quantity,
+    })),
     stripeConfigured: isStripeConfigured(),
     devPaymentAllowed:
       process.env.NODE_ENV !== "production" || process.env.ALLOW_DEV_PAYMENT === "true",

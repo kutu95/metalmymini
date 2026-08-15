@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, requireAdmin } from "@/lib/auth";
-import { addStatusHistory } from "@/lib/orders";
+import { addStatusHistory, orderItemsInclude } from "@/lib/orders";
 import { adminOrderUpdateSchema } from "@/lib/validators";
 
 export async function GET(
@@ -18,7 +18,7 @@ export async function GET(
     const order = await prisma.order.findUnique({
       where: { id },
       include: {
-        uploadedFile: true,
+        ...orderItemsInclude,
         statusHistory: { orderBy: { createdAt: "desc" } },
         galleryItems: true,
       },
@@ -90,7 +90,7 @@ export async function PATCH(
     const order = await prisma.order.findUnique({
       where: { id },
       include: {
-        uploadedFile: true,
+        ...orderItemsInclude,
         statusHistory: { orderBy: { createdAt: "desc" } },
         galleryItems: true,
       },

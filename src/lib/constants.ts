@@ -17,6 +17,8 @@ export const DEFAULT_PRODUCT_DESCRIPTION =
   "A genuine copper surface, electroplated over your print and polished to a metal shine. Looks like solid bronze and takes a natural patina over time.";
 
 export const ACCEPTED_FILE_TYPES = [".stl", ".obj", ".3mf"] as const;
+export const MAX_ORDER_FILES = 10;
+export const MAX_LINE_QUANTITY = 99;
 export const ACCEPTED_MIME_TYPES = [
   "model/stl",
   "application/sla",

@@ -4,8 +4,18 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Card } from "@/components/ui";
 import { FormField, inputClassName, textareaClassName } from "@/components/forms";
-import { LEGAL_CHECKOUT_TEXT, SHIPPING_COUNTRY } from "@/lib/constants";
+import { LEGAL_CHECKOUT_TEXT, MAX_LINE_QUANTITY, MAX_ORDER_FILES, SHIPPING_COUNTRY } from "@/lib/constants";
 import { formatAud } from "@/lib/format";
+
+type ModelLine = {
+  id: string;
+  quantity: number;
+  fileName: string;
+};
+
+function newModelLine(): ModelLine {
+  return { id: crypto.randomUUID(), quantity: 1, fileName: "" };
+}
 
 type CatalogProduct = {
   id: string;
@@ -20,7 +30,7 @@ export function OrderForm() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [quantity, setQuantity] = useState(1);
+  const [lines, setLines] = useState<ModelLine[]>([newModelLine()]);
   const [postcode, setPostcode] = useState("");
   const [createAccount, setCreateAccount] = useState(false);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
@@ -31,7 +41,8 @@ export function OrderForm() {
 
   const selected = products.find((p) => p.id === productId) ?? null;
   const unitPrice = selected?.priceCents ?? 0;
-  const productTotal = unitPrice * quantity;
+  const totalMinis = lines.reduce((sum, line) => sum + Math.max(0, line.quantity), 0);
+  const productTotal = unitPrice * totalMinis;
   const totalPrice = productTotal + (shippingPrice ?? 0);
 
   useEffect(() => {
@@ -56,7 +67,7 @@ export function OrderForm() {
     const timer = setTimeout(() => {
       setQuoting(true);
       fetch(
-        `/api/shipping/quote?postcode=${encodeURIComponent(postcode)}&quantity=${quantity}`,
+        `/api/shipping/quote?postcode=${encodeURIComponent(postcode)}&quantity=${Math.max(1, totalMinis)}`,
         { signal: controller.signal },
       )
         .then(async (response) => {
@@ -80,7 +91,7 @@ export function OrderForm() {
       controller.abort();
       clearTimeout(timer);
     };
-  }, [postcode, quantity]);
+  }, [postcode, totalMinis]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -118,20 +129,77 @@ export function OrderForm() {
     <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
       <div className="space-y-6">
         <Card>
-          <h2 className="text-lg font-medium text-stone-100">Your model file</h2>
-          <FormField label="Upload STL, OBJ, or 3MF" hint="Up to 100 mm in any dimension. Reviewed before production.">
-            <input
-              name="modelFile"
-              type="file"
-              required
-              accept=".stl,.obj,.3mf"
-              className={inputClassName}
-            />
-          </FormField>
+          <h2 className="text-lg font-medium text-stone-100">Your models</h2>
+          <p className="mt-2 text-sm text-stone-400">
+            Each STL, OBJ, or 3MF can have its own quantity. One finish applies to the whole order.
+          </p>
+          <div className="mt-4 space-y-4">
+            {lines.map((line, index) => (
+              <div key={line.id} className="grid gap-3 md:grid-cols-[1fr_7rem_auto]">
+                <FormField
+                  label={index === 0 ? "Upload STL, OBJ, or 3MF" : `Model ${index + 1}`}
+                  hint={index === 0 ? "Up to 100 mm in any dimension. Reviewed before production." : undefined}
+                >
+                  <input
+                    name={`modelFile_${index}`}
+                    type="file"
+                    required
+                    accept=".stl,.obj,.3mf"
+                    className={inputClassName}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      setLines((current) =>
+                        current.map((item) =>
+                          item.id === line.id ? { ...item, fileName: file?.name ?? "" } : item,
+                        ),
+                      );
+                    }}
+                  />
+                </FormField>
+                <FormField label="Qty">
+                  <input
+                    name={`quantity_${index}`}
+                    type="number"
+                    min={1}
+                    max={MAX_LINE_QUANTITY}
+                    value={line.quantity}
+                    onChange={(e) => {
+                      const quantity = Math.min(MAX_LINE_QUANTITY, Math.max(1, Number(e.target.value) || 1));
+                      setLines((current) =>
+                        current.map((item) => (item.id === line.id ? { ...item, quantity } : item)),
+                      );
+                    }}
+                    className={inputClassName}
+                  />
+                </FormField>
+                {lines.length > 1 ? (
+                  <button
+                    type="button"
+                    className="self-end pb-2 text-sm text-stone-400 hover:text-stone-200"
+                    onClick={() => setLines((current) => current.filter((item) => item.id !== line.id))}
+                  >
+                    Remove
+                  </button>
+                ) : (
+                  <span className="hidden md:block" />
+                )}
+              </div>
+            ))}
+          </div>
+          {lines.length < MAX_ORDER_FILES ? (
+            <Button
+              type="button"
+              variant="secondary"
+              className="mt-4"
+              onClick={() => setLines((current) => [...current, newModelLine()])}
+            >
+              Add another model
+            </Button>
+          ) : null}
         </Card>
 
         <Card>
-          <h2 className="text-lg font-medium text-stone-100">Finish and quantity</h2>
+          <h2 className="text-lg font-medium text-stone-100">Finish</h2>
           {products.length === 0 ? (
             <p className="mt-4 text-sm text-stone-400">No finishes are available right now.</p>
           ) : (
@@ -170,19 +238,6 @@ export function OrderForm() {
               })}
             </div>
           )}
-          <div className="mt-4">
-            <FormField label="Quantity">
-              <input
-                name="quantity"
-                type="number"
-                min={1}
-                max={99}
-                value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value))}
-                className={inputClassName}
-              />
-            </FormField>
-          </div>
         </Card>
 
         <Card>
@@ -277,13 +332,15 @@ export function OrderForm() {
         <Card className="sticky top-6">
           <h2 className="text-lg font-medium text-stone-100">Order summary</h2>
           <div className="mt-4 space-y-2 text-sm text-stone-400">
+            {lines.map((line) => (
+              <div key={line.id} className="flex justify-between gap-4">
+                <span className="truncate">{line.fileName || "Model file"}</span>
+                <span>× {line.quantity}</span>
+              </div>
+            ))}
             <div className="flex justify-between">
               <span>{selected?.name ?? "Finish"}</span>
-              <span>{selected ? formatAud(unitPrice) : "—"}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Quantity</span>
-              <span>{quantity}</span>
+              <span>{selected ? `${formatAud(unitPrice)} × ${totalMinis}` : "—"}</span>
             </div>
             <div className="flex justify-between gap-4">
               <span>Shipping</span>
@@ -313,7 +370,7 @@ export function OrderForm() {
           </Button>
           <p className="mt-4 text-xs text-stone-500">
             Payment is taken on submission and includes Australia Post shipping at the quoted rate.
-            Your file will be reviewed and you will be contacted if anything needs attention.
+            Your files will be reviewed and you will be contacted if anything needs attention.
           </p>
         </Card>
       </div>

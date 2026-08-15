@@ -1,4 +1,4 @@
-import { mkdir, writeFile, readFile } from "fs/promises";
+import { copyFile, mkdir, writeFile, readFile } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
 import { ACCEPTED_FILE_TYPES } from "@/lib/constants";
@@ -63,6 +63,32 @@ export async function saveModelFile(file: File) {
     storedFilename,
     fileType: ext.replace(".", ""),
     fileSize: file.size,
+    filePath,
+  };
+}
+
+export async function copyStoredModelFile(source: {
+  originalFilename: string;
+  storedFilename: string;
+  fileType: string;
+  fileSize: number;
+  filePath: string;
+}) {
+  await ensureStorageDirs();
+
+  const ext = path.extname(source.storedFilename).toLowerCase() || `.${source.fileType}`;
+  const storedFilename = `${randomUUID()}${ext}`;
+  const filePath = path.join(getUploadsDir(), storedFilename);
+  const sourcePath = source.filePath.startsWith(STORAGE_ROOT)
+    ? source.filePath
+    : path.join(getUploadsDir(), source.storedFilename);
+  await copyFile(sourcePath, filePath);
+
+  return {
+    originalFilename: source.originalFilename,
+    storedFilename,
+    fileType: source.fileType,
+    fileSize: source.fileSize,
     filePath,
   };
 }

@@ -6,6 +6,11 @@ import { Button, Card, PageHeading, StatusBadge } from "@/components/ui";
 import { PAYMENT_STATUS_LABELS, PRODUCTION_STATUS_LABELS } from "@/lib/constants";
 import { formatAud, formatDateTime } from "@/lib/format";
 
+type OrderItem = {
+  quantity: number;
+  uploadedFile: { originalFilename: string };
+};
+
 type Order = {
   id: string;
   orderNumber: string;
@@ -15,6 +20,7 @@ type Order = {
   paymentStatus: keyof typeof PAYMENT_STATUS_LABELS;
   productionStatus: keyof typeof PRODUCTION_STATUS_LABELS;
   createdAt: string;
+  items?: OrderItem[];
 };
 
 export default function MyOrdersPage() {
@@ -34,8 +40,6 @@ export default function MyOrdersPage() {
   async function reorder(orderId: string) {
     const response = await fetch(`/api/orders/${orderId}/reorder`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ quantity: 1 }),
     });
     const data = await response.json();
     if (!response.ok) {
@@ -58,6 +62,13 @@ export default function MyOrdersPage() {
                 <p className="mt-1 text-sm text-stone-400">
                   {order.productName} × {order.quantity} — {formatAud(order.totalPrice)}
                 </p>
+                {(order.items ?? []).length > 0 ? (
+                  <p className="mt-1 text-xs text-stone-500">
+                    {order.items
+                      ?.map((item) => `${item.uploadedFile.originalFilename} × ${item.quantity}`)
+                      .join(", ")}
+                  </p>
+                ) : null}
                 <p className="mt-1 text-xs text-stone-500">{formatDateTime(order.createdAt)}</p>
               </div>
               <div className="flex flex-wrap gap-2">

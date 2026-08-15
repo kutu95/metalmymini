@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { calculateOrderTotal, extractPostcodeFromAddress, generateOrderNumber, addStatusHistory } from "@/lib/orders";
+import { calculateOrderTotal, extractPostcodeFromAddress, generateOrderNumber, addStatusHistory, orderItemsInclude } from "@/lib/orders";
+import { copyStoredModelFile } from "@/lib/storage";
 import { SHIPPING_COUNTRY } from "@/lib/constants";
 
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
@@ -20,7 +21,7 @@ export async function POST(
         id,
         OR: [{ userId: user.id }, { customerEmail: user.email }],
       },
-      include: { uploadedFile: true },
+      include: orderItemsInclude,
     });
 
     if (!sourceOrder) {
@@ -34,8 +35,10 @@ export async function POST(
       );
     }
 
-    const body = await request.json();
-    const quantity = Number(body.quantity ?? 1);
+    if (sourceOrder.items.length === 0) {
+      return NextResponse.json({ error: "Original order has no model files" }, { status: 400 });
+    }
+
     const postcode =
       sourceOrder.shippingPostcode ?? extractPostcodeFromAddress(sourceOrder.shippingAddress);
     if (!postcode) {
@@ -45,21 +48,23 @@ export async function POST(
       );
     }
 
+    const totalMinis = sourceOrder.items.reduce((sum, item) => sum + item.quantity, 0);
     const { product, unitPrice, shippingPrice, totalPrice } = await calculateOrderTotal(
-      quantity,
+      totalMinis,
       postcode,
       sourceOrder.productId,
     );
 
-    const reorderFile = await prisma.uploadedFile.create({
-      data: {
-        originalFilename: sourceOrder.uploadedFile.originalFilename,
-        storedFilename: sourceOrder.uploadedFile.storedFilename,
-        fileType: sourceOrder.uploadedFile.fileType,
-        fileSize: sourceOrder.uploadedFile.fileSize,
-        filePath: sourceOrder.uploadedFile.filePath,
-      },
-    });
+    const copiedItems = [];
+    for (const [sortOrder, item] of sourceOrder.items.entries()) {
+      const copied = await copyStoredModelFile(item.uploadedFile);
+      const uploadedFile = await prisma.uploadedFile.create({ data: copied });
+      copiedItems.push({
+        uploadedFileId: uploadedFile.id,
+        quantity: item.quantity,
+        sortOrder,
+      });
+    }
 
     const order = await prisma.order.create({
       data: {
@@ -72,19 +77,19 @@ export async function POST(
         country: SHIPPING_COUNTRY,
         productId: product.id,
         productName: product.name,
-        quantity,
+        quantity: totalMinis,
         unitPrice,
         shippingPrice,
         totalPrice,
-        uploadedFileId: reorderFile.id,
         termsAccepted: true,
         publicGalleryConsentAccepted: true,
         paymentStatus: "unpaid",
         productionStatus: "submitted",
+        items: { create: copiedItems },
       },
     });
 
-    await addStatusHistory(order.id, "submitted", "Reorder from stored file");
+    await addStatusHistory(order.id, "submitted", "Reorder from stored files");
 
     return NextResponse.json({ orderId: order.id, orderNumber: order.orderNumber, totalPrice });
   } catch (error) {

@@ -48,14 +48,20 @@ export function normalizeAuPostcode(value: string) {
   return digits;
 }
 
-export function estimateParcelWeightKg(_quantity: number) {
-  return DEFAULT_PARCEL.weightKg;
+function extraMiniCount(quantity: number) {
+  return Math.max(1, Math.round(quantity)) - 1;
 }
 
-export function estimateParcelDimensions(_quantity: number) {
+/** Base pack is one mini. Each extra mini adds 100 g. */
+export function estimateParcelWeightKg(quantity: number) {
+  return Number((DEFAULT_PARCEL.weightKg + extraMiniCount(quantity) * 0.1).toFixed(3));
+}
+
+/** Base pack is one mini. Each extra mini adds 40 mm (4 cm) width. */
+export function estimateParcelDimensions(quantity: number) {
   return {
     lengthCm: DEFAULT_PARCEL.lengthCm,
-    widthCm: DEFAULT_PARCEL.widthCm,
+    widthCm: DEFAULT_PARCEL.widthCm + extraMiniCount(quantity) * 4,
     heightCm: DEFAULT_PARCEL.heightCm,
   };
 }

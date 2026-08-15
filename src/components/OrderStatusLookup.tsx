@@ -17,6 +17,7 @@ type OrderSummary = {
   paymentStatus: keyof typeof PAYMENT_STATUS_LABELS;
   productionStatus: keyof typeof PRODUCTION_STATUS_LABELS;
   createdAt: string;
+  items?: Array<{ quantity: number; uploadedFile: { originalFilename: string } }>;
 };
 
 type OrderStatusLookupProps = {
@@ -230,9 +231,15 @@ export function OrderStatusLookup({ isLoggedIn }: OrderStatusLookupProps) {
                   <div>
                     <p className="font-medium text-stone-100">{order.orderNumber}</p>
                     <p className="mt-1 text-sm text-stone-400">
-                      {order.productName} × {order.quantity} —{" "}
-                      {formatAud(order.totalPrice)}
+                      {order.productName} × {order.quantity} — {formatAud(order.totalPrice)}
                     </p>
+                    {(order.items ?? []).length > 0 ? (
+                      <p className="mt-1 text-xs text-stone-500">
+                        {order.items
+                          ?.map((item) => `${item.uploadedFile.originalFilename} × ${item.quantity}`)
+                          .join(", ")}
+                      </p>
+                    ) : null}
                     <p className="mt-1 text-xs text-stone-500">{formatDateTime(order.createdAt)}</p>
                   </div>
                   <div className="flex flex-wrap gap-2">

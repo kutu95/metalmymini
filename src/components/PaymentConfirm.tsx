@@ -13,6 +13,7 @@ type CheckoutPreview = {
   shippingPrice: number;
   totalPrice: number;
   paymentStatus: string;
+  items?: Array<{ filename: string; quantity: number }>;
   stripeConfigured: boolean;
   devPaymentAllowed: boolean;
 };
@@ -120,6 +121,12 @@ export function PaymentConfirm() {
             payment.
           </p>
           <div className="mt-4 space-y-2 text-sm text-stone-400">
+            {(preview.items ?? []).map((item, index) => (
+              <div key={`${item.filename}-${index}`} className="flex justify-between gap-4">
+                <span className="truncate">{item.filename}</span>
+                <span>× {item.quantity}</span>
+              </div>
+            ))}
             <div className="flex justify-between gap-4">
               <span>
                 {preview.productLabel} × {preview.quantity}
@@ -136,7 +143,7 @@ export function PaymentConfirm() {
             </div>
           </div>
           <p className="mt-4 text-sm text-stone-500">
-            After payment, your file will be reviewed and you will be contacted if anything needs
+            After payment, your files will be reviewed and you will be contacted if anything needs
             attention.
           </p>
         </>
