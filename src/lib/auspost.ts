@@ -99,13 +99,28 @@ export async function quoteDomesticParcel(input: {
   });
 
   const url = `${baseUrl}/postage/parcel/domestic/calculate.json?${params}`;
-  const response = await fetch(url, {
-    method: "GET",
-    headers: { "AUTH-KEY": apiKey, Accept: "application/json" },
-    cache: "no-store",
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: "GET",
+      headers: { "AUTH-KEY": apiKey, Accept: "application/json" },
+      cache: "no-store",
+      signal: AbortSignal.timeout(10_000),
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error && error.name === "TimeoutError"
+        ? "Australia Post quote timed out"
+        : "Unable to reach Australia Post";
+    throw new Error(message);
+  }
 
-  const data = (await response.json()) as PacCalculateResponse;
+  let data: PacCalculateResponse;
+  try {
+    data = (await response.json()) as PacCalculateResponse;
+  } catch {
+    throw new Error(`Australia Post returned an invalid response (${response.status})`);
+  }
 
   if (!response.ok) {
     const message =

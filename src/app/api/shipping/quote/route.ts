@@ -28,6 +28,8 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to quote shipping";
-    return NextResponse.json({ error: message }, { status: 502 });
+    // Avoid HTTP 502 — Cloudflare replaces those with a generic page and hides the error body.
+    const status = message.includes("not configured") ? 503 : 422;
+    return NextResponse.json({ error: message }, { status });
   }
 }
