@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function LogoutButton({
@@ -8,16 +7,18 @@ export function LogoutButton({
 }: {
   className?: string;
 }) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   async function handleLogout() {
     setLoading(true);
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
-      router.push("/");
-      router.refresh();
-    } finally {
+      const response = await fetch("/api/auth/logout", { method: "POST" });
+      if (!response.ok) {
+        throw new Error("Logout failed");
+      }
+      // Full reload so the root layout re-reads the cleared session cookie.
+      window.location.assign("/");
+    } catch {
       setLoading(false);
     }
   }

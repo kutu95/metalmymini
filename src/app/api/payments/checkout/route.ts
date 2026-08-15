@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
         orderId: order.id,
         orderNumber: order.orderNumber,
       },
-      success_url: `${appUrl}/order/status?orderNumber=${encodeURIComponent(order.orderNumber)}&paid=1`,
+      success_url: `${appUrl}/order/status?orderNumber=${encodeURIComponent(order.orderNumber)}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/order/confirm?orderId=${encodeURIComponent(order.id)}&orderNumber=${encodeURIComponent(order.orderNumber)}&cancelled=1`,
     });
 

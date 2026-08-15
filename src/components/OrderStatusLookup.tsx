@@ -27,17 +27,63 @@ export function OrderStatusLookup({ isLoggedIn }: OrderStatusLookupProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderNumberParam = searchParams.get("orderNumber");
+  const sessionIdParam = searchParams.get("session_id");
+  const paidParam = searchParams.get("paid");
 
   const [orders, setOrders] = useState<OrderSummary[]>([]);
   const [trackingOrder, setTrackingOrder] = useState<OrderTrackingData | null>(null);
   const [loadingList, setLoadingList] = useState(isLoggedIn);
   const [loadingTracking, setLoadingTracking] = useState(false);
+  const [paymentSyncMessage, setPaymentSyncMessage] = useState("");
 
   const [orderNumber, setOrderNumber] = useState("");
   const [email, setEmail] = useState("");
   const [guestTracking, setGuestTracking] = useState<OrderTrackingData | null>(null);
   const [error, setError] = useState("");
   const [loadingGuest, setLoadingGuest] = useState(false);
+
+  useEffect(() => {
+    if (!sessionIdParam && paidParam !== "1") return;
+    if (!orderNumberParam && !sessionIdParam) return;
+
+    let cancelled = false;
+    setPaymentSyncMessage("Confirming payment with Stripe…");
+
+    fetch("/api/payments/confirm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionId: sessionIdParam || undefined,
+        orderNumber: orderNumberParam || undefined,
+      }),
+    })
+      .then(async (response) => {
+        const data = await response.json();
+        if (cancelled) return;
+        if (!response.ok) {
+          setPaymentSyncMessage(data.error ?? "Could not confirm payment yet.");
+          return;
+        }
+        if (data.paid) {
+          setPaymentSyncMessage("Payment confirmed. Thank you!");
+          if (isLoggedIn) {
+            // Refresh list so payment badges update.
+            const listResponse = await fetch("/api/orders");
+            const listData = await listResponse.json();
+            if (!cancelled && listResponse.ok) setOrders(listData.orders ?? []);
+          }
+        } else {
+          setPaymentSyncMessage("Payment is still processing. Refresh in a moment if status stays unpaid.");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setPaymentSyncMessage("Could not confirm payment yet.");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionIdParam, paidParam, orderNumberParam, isLoggedIn]);
 
   const loadTracking = useCallback(async (orderId: string, orderNumberForUrl: string) => {
     setLoadingTracking(true);
@@ -158,6 +204,9 @@ export function OrderStatusLookup({ isLoggedIn }: OrderStatusLookupProps) {
 
     return (
       <div className="space-y-6">
+        {paymentSyncMessage ? (
+          <p className="text-sm text-copper-light">{paymentSyncMessage}</p>
+        ) : null}
         {error && <p className="text-sm text-red-400">{error}</p>}
 
         {orders.length === 0 ? (
@@ -209,6 +258,9 @@ export function OrderStatusLookup({ isLoggedIn }: OrderStatusLookupProps) {
 
   return (
     <div className="space-y-6">
+      {paymentSyncMessage ? (
+        <p className="text-sm text-copper-light">{paymentSyncMessage}</p>
+      ) : null}
       {guestTracking ? (
         <div className="space-y-4">
           <button
