@@ -29,7 +29,7 @@ export async function POST(
 
     const body = await request.json();
     const quantity = Number(body.quantity ?? 1);
-    const { unitPrice, totalPrice } = calculateOrderTotal(quantity);
+    const { unitPrice, totalPrice } = await calculateOrderTotal(quantity);
 
     const reorderFile = await prisma.uploadedFile.create({
       data: {

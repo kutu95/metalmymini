@@ -1,6 +1,9 @@
 import { BUSINESS_LOCATION_DISPLAY, SITE_NAME, SITE_NAME_ALT, SITE_URL } from "@/lib/seo";
+import { getDisplayCopperProduct } from "@/lib/site-settings";
 
-export function getLlmsTxt(): string {
+export async function getLlmsTxt(): Promise<string> {
+  const displayCopper = await getDisplayCopperProduct();
+
   return `# ${SITE_NAME}
 
 > ${SITE_NAME_ALT} is run by Shay in ${BUSINESS_LOCATION_DISPLAY}. Upload your STL, OBJ, or 3MF — it is printed in UV resin, electroplated in real copper, and hand-finished. Shipping within Australia.
@@ -14,7 +17,7 @@ export function getLlmsTxt(): string {
 
 ## Finish
 
-- Display Copper (AUD $45) — electroplated copper, polished to a metal shine
+- ${displayCopper.name} (${displayCopper.priceDisplay}) — electroplated copper, polished to a metal shine
 
 ## Location
 

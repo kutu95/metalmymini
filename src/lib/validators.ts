@@ -76,6 +76,10 @@ export const heroRotationSchema = z.object({
   heroRotationSeconds: z.coerce.number().min(1).max(60),
 });
 
+export const displayCopperPriceSchema = z.object({
+  displayCopperPriceAud: z.coerce.number().min(1).max(5000),
+});
+
 export const subscribeSchema = z.object({
   email: z.string().email(),
   firstName: z.string().trim().min(1).max(80).optional(),

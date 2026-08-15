@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
 
     const savedFile = await saveModelFile(file);
     const uploadedFile = await prisma.uploadedFile.create({ data: savedFile });
-    const { unitPrice, totalPrice } = calculateOrderTotal(parsed.data.quantity);
+    const { unitPrice, totalPrice } = await calculateOrderTotal(parsed.data.quantity);
 
     const order = await prisma.order.create({
       data: {

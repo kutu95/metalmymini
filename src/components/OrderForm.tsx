@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Card } from "@/components/ui";
 import { FormField, inputClassName, textareaClassName } from "@/components/forms";
 import { DEFAULT_PRODUCT_OPTION, LEGAL_CHECKOUT_TEXT, PRODUCTS, SHIPPING_COUNTRY } from "@/lib/constants";
 import { formatAud } from "@/lib/format";
 
-const PRODUCT = PRODUCTS.cosmetic_copper;
+const PRODUCT_BASE = PRODUCTS.cosmetic_copper;
 
 export function OrderForm() {
   const router = useRouter();
@@ -15,9 +15,26 @@ export function OrderForm() {
   const [loading, setLoading] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [createAccount, setCreateAccount] = useState(false);
+  const [unitPrice, setUnitPrice] = useState(PRODUCT_BASE.priceCents);
+  const [priceDisplay, setPriceDisplay] = useState(PRODUCT_BASE.priceDisplay);
 
-  const unitPrice = PRODUCT.priceCents;
   const totalPrice = unitPrice * quantity;
+
+  useEffect(() => {
+    fetch("/api/site-settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (typeof data.displayCopperPriceCents === "number") {
+          setUnitPrice(data.displayCopperPriceCents);
+        }
+        if (typeof data.displayCopperPriceDisplay === "string") {
+          setPriceDisplay(data.displayCopperPriceDisplay);
+        }
+      })
+      .catch(() => {
+        // Keep default price from constants if settings fail to load.
+      });
+  }, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -63,9 +80,9 @@ export function OrderForm() {
         <Card>
           <h2 className="text-lg font-medium text-stone-100">Finish and quantity</h2>
           <div className="mt-4 rounded-lg border border-copper bg-copper/10 p-4">
-            <span className="block font-medium text-stone-100">{PRODUCT.name}</span>
-            <span className="mt-1 block text-sm text-stone-400">{PRODUCT.description}</span>
-            <span className="mt-1 block text-sm text-copper-light">{PRODUCT.priceDisplay}</span>
+            <span className="block font-medium text-stone-100">{PRODUCT_BASE.name}</span>
+            <span className="mt-1 block text-sm text-stone-400">{PRODUCT_BASE.description}</span>
+            <span className="mt-1 block text-sm text-copper-light">{priceDisplay}</span>
           </div>
           <div className="mt-4">
             <FormField label="Quantity">
@@ -84,7 +101,7 @@ export function OrderForm() {
 
         <Card>
           <h2 className="text-lg font-medium text-stone-100">Shipping details</h2>
-          <p className="mt-2 text-sm text-stone-400">International shipping coming soon...</p>
+          <p className="mt-2 text-sm text-stone-400">Australia Only. International shipping coming soon...</p>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <FormField label="Full name">
               <input name="customerName" required className={inputClassName} />
@@ -165,7 +182,7 @@ export function OrderForm() {
           <h2 className="text-lg font-medium text-stone-100">Order summary</h2>
           <div className="mt-4 space-y-2 text-sm text-stone-400">
             <div className="flex justify-between">
-              <span>{PRODUCT.name}</span>
+              <span>{PRODUCT_BASE.name}</span>
               <span>{formatAud(unitPrice)}</span>
             </div>
             <div className="flex justify-between">

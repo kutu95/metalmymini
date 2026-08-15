@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { ProductionStatus } from "@/generated/prisma/client";
-import { PRODUCTS } from "@/lib/constants";
+import { getDisplayCopperPriceCents } from "@/lib/site-settings";
 
 export function generateOrderNumber() {
   const now = new Date();
@@ -9,8 +9,8 @@ export function generateOrderNumber() {
   return `MMM-${date}-${rand}`;
 }
 
-export function calculateOrderTotal(quantity: number) {
-  const unitPrice = PRODUCTS.cosmetic_copper.priceCents;
+export async function calculateOrderTotal(quantity: number) {
+  const unitPrice = await getDisplayCopperPriceCents();
   return { unitPrice, totalPrice: unitPrice * quantity };
 }
 

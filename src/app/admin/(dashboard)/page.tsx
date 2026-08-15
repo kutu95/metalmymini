@@ -49,6 +49,9 @@ export default function AdminDashboardPage() {
           <Button href="/admin/hero" variant="secondary">
             Hero Images
           </Button>
+          <Button href="/admin/pricing" variant="secondary">
+            Pricing
+          </Button>
           <Button href="/admin/gallery" variant="secondary">
             Gallery Manager
           </Button>

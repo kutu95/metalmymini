@@ -33,7 +33,7 @@ export const FAQ_ITEMS = [
   {
     question: "What copper finish do you offer?",
     answer:
-      "Display Copper (AUD $45) — a genuine copper surface, electroplated over your print and polished to a metal shine. It looks like solid bronze and takes a natural patina over time.",
+      "Display Copper — a genuine copper surface, electroplated over your print and polished to a metal shine. It looks like solid bronze and takes a natural patina over time. Current price is shown on the order page.",
   },
   {
     question: "Is my model reviewed before production?",
@@ -165,7 +165,7 @@ function buildProductOffer() {
   };
 }
 
-export function getHomeJsonLd(productImageUrls?: string[]) {
+export function getHomeJsonLd(productImageUrls?: string[], priceCents?: number) {
   const organizationId = `${SITE_URL}/#organization`;
   const websiteId = `${SITE_URL}/#website`;
 
@@ -174,21 +174,24 @@ export function getHomeJsonLd(productImageUrls?: string[]) {
       ? productImageUrls.map(toAbsoluteUrl)
       : [];
 
-  const products = Object.values(PRODUCTS).map((product) => ({
-    "@type": "Product",
-    "@id": `${SITE_URL}/#product-${product.id}`,
-    name: product.name,
-    description: product.description,
-    image: [DEFAULT_PRODUCT_IMAGE, ...heroImages.filter((url) => url !== DEFAULT_PRODUCT_IMAGE)],
-    brand: {
-      "@type": "Brand",
-      name: SITE_NAME,
-    },
-    offers: {
-      ...buildProductOffer(),
-      price: (product.priceCents / 100).toFixed(2),
-    },
-  }));
+  const products = Object.values(PRODUCTS).map((product) => {
+    const cents = priceCents ?? product.priceCents;
+    return {
+      "@type": "Product",
+      "@id": `${SITE_URL}/#product-${product.id}`,
+      name: product.name,
+      description: product.description,
+      image: [DEFAULT_PRODUCT_IMAGE, ...heroImages.filter((url) => url !== DEFAULT_PRODUCT_IMAGE)],
+      brand: {
+        "@type": "Brand",
+        name: SITE_NAME,
+      },
+      offers: {
+        ...buildProductOffer(),
+        price: (cents / 100).toFixed(2),
+      },
+    };
+  });
 
   return {
     "@context": "https://schema.org",

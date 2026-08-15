@@ -92,7 +92,7 @@ export const LEGAL_CHECKOUT_TEXT = {
 
 export const PROCESS_STEPS = [
   { step: 1, title: "Upload your model", detail: "STL, OBJ, or 3MF — up to 100 mm" },
-  { step: 2, title: "Display Copper", detail: "AUD $45 — electroplated copper, polished to a metal shine" },
+  { step: 2, title: "Display Copper", detail: "Electroplated copper, polished to a metal shine" },
   { step: 3, title: "Pay securely", detail: "Payment taken when you submit" },
   { step: 4, title: "File review", detail: "I check printability, size, and how well it'll take copper" },
   { step: 5, title: "Print, plate, finish", detail: "UV resin print, then real copper electroplating" },

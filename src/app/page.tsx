@@ -9,12 +9,11 @@ import {
   FOUNDER,
   LEGAL_CHECKOUT_TEXT,
   PROCESS_STEPS,
-  PRODUCTS,
   WHY_METAL_MY_MINI,
 } from "@/lib/constants";
 import { formatDate, productLabel } from "@/lib/format";
 import { createPageMetadata, DEFAULT_DESCRIPTION, getHomeJsonLd } from "@/lib/seo";
-import { getHeroRotationMs } from "@/lib/site-settings";
+import { getDisplayCopperProduct, getHeroRotationMs } from "@/lib/site-settings";
 
 export const metadata = createPageMetadata({
   title: "Custom Copper-Plated Miniatures",
@@ -46,10 +45,11 @@ async function getGalleryPreview() {
 }
 
 export default async function HomePage() {
-  const [heroImages, gallery, heroRotationMs] = await Promise.all([
+  const [heroImages, gallery, heroRotationMs, displayCopper] = await Promise.all([
     getHeroImages(),
     getGalleryPreview(),
     getHeroRotationMs(),
+    getDisplayCopperProduct(),
   ]);
 
   const heroSlides =
@@ -68,7 +68,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <JsonLd data={getHomeJsonLd(productImages)} />
+      <JsonLd data={getHomeJsonLd(productImages, displayCopper.priceCents)} />
       <div className="space-y-20">
       {/* 1. Product — Hero */}
       <section className="grid items-center gap-12 lg:grid-cols-2">
@@ -100,13 +100,11 @@ export default async function HomePage() {
           One finish: Display Copper. Real copper on your print, polished to a metal shine.
         </p>
         <div className="grid gap-6 md:grid-cols-2">
-          {Object.values(PRODUCTS).map((product) => (
-            <Card key={product.id}>
-              <p className="text-sm uppercase tracking-wide text-copper-light">{product.priceDisplay}</p>
-              <h3 className="mt-2 text-xl font-medium text-stone-100">{product.name}</h3>
-              <p className="mt-3 leading-relaxed text-stone-400">{product.description}</p>
-            </Card>
-          ))}
+          <Card>
+            <p className="text-sm uppercase tracking-wide text-copper-light">{displayCopper.priceDisplay}</p>
+            <h3 className="mt-2 text-xl font-medium text-stone-100">{displayCopper.name}</h3>
+            <p className="mt-3 leading-relaxed text-stone-400">{displayCopper.description}</p>
+          </Card>
         </div>
       </section>
 
@@ -164,7 +162,11 @@ export default async function HomePage() {
             <Card key={step.step}>
               <p className="text-sm text-copper-light">Step {step.step}</p>
               <h3 className="mt-2 font-medium text-stone-100">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-stone-400">{step.detail}</p>
+              <p className="mt-2 text-sm leading-relaxed text-stone-400">
+                {step.step === 2
+                  ? `${displayCopper.priceDisplay} — ${step.detail.toLowerCase()}`
+                  : step.detail}
+              </p>
             </Card>
           ))}
         </div>
