@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button, Card, PageHeading, StatusBadge } from "@/components/ui";
+import { ModelPreviewModal } from "@/components/ModelPreview";
 import { PRODUCTION_STATUS_LABELS, PAYMENT_STATUS_LABELS } from "@/lib/constants";
 import { formatAud, formatDateTime } from "@/lib/format";
 import { FormField, inputClassName, selectClassName, textareaClassName } from "@/components/forms";
@@ -40,6 +41,7 @@ export default function AdminOrderDetailPage() {
   const params = useParams<{ id: string }>();
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [message, setMessage] = useState("");
+  const [preview, setPreview] = useState<{ id: string; name: string } | null>(null);
   const [form, setForm] = useState({
     productionStatus: "",
     paymentStatus: "",
@@ -157,16 +159,28 @@ export default function AdminOrderDetailPage() {
               {order.publicGalleryConsentAccepted ? "Yes (default)" : "No — customer opted out"}
             </p>
             {order.items && order.items.length > 0 ? (
-              <ul className="mt-4 space-y-1 text-sm">
+              <ul className="mt-4 space-y-2 text-sm">
                 {order.items.map((item) => (
-                  <li key={item.id}>
-                    <a
-                      href={`/api/files/models/${item.uploadedFile.id}`}
+                  <li key={item.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPreview({
+                          id: item.uploadedFile.id,
+                          name: item.uploadedFile.originalFilename,
+                        })
+                      }
                       className="text-copper-light hover:underline"
                     >
-                      Download {item.uploadedFile.originalFilename}
+                      Preview {item.uploadedFile.originalFilename}
+                    </button>
+                    <span className="text-stone-500">× {item.quantity}</span>
+                    <a
+                      href={`/api/files/models/${item.uploadedFile.id}`}
+                      className="text-stone-400 hover:text-stone-200 hover:underline"
+                    >
+                      Download
                     </a>
-                    <span className="text-stone-500"> × {item.quantity}</span>
                   </li>
                 ))}
               </ul>
@@ -256,6 +270,15 @@ export default function AdminOrderDetailPage() {
           {message && <p className="text-sm text-copper-light">{message}</p>}
         </div>
       </div>
+
+      {preview ? (
+        <ModelPreviewModal
+          open
+          title={preview.name}
+          src={{ url: `/api/files/models/${preview.id}`, name: preview.name }}
+          onClose={() => setPreview(null)}
+        />
+      ) : null}
     </div>
   );
 }

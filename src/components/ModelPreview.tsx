@@ -6,14 +6,45 @@ import type { Mesh, Object3D } from "three";
 const MAX_PREVIEW_BYTES = 40 * 1024 * 1024;
 const COPPER_COLOR = 0xb87333;
 
-type ModelPreviewProps = {
-  file: File;
+type ModelPreviewSource = {
+  url: string;
+  name: string;
 };
 
-export function ModelPreview({ file }: ModelPreviewProps) {
+type ModelPreviewProps = {
+  file?: File;
+  src?: ModelPreviewSource;
+  className?: string;
+};
+
+async function readModelBytes(file?: File, src?: ModelPreviewSource) {
+  if (file) {
+    if (file.size > MAX_PREVIEW_BYTES) {
+      throw new Error("This file is too large to preview in the browser.");
+    }
+    return { buffer: await file.arrayBuffer(), name: file.name };
+  }
+
+  if (!src) {
+    throw new Error("No model file to preview.");
+  }
+
+  const response = await fetch(src.url, { credentials: "same-origin" });
+  if (!response.ok) {
+    throw new Error("Unable to load this model for preview.");
+  }
+  const blob = await response.blob();
+  if (blob.size > MAX_PREVIEW_BYTES) {
+    throw new Error("This file is too large to preview in the browser.");
+  }
+  return { buffer: await blob.arrayBuffer(), name: src.name };
+}
+
+export function ModelPreview({ file, src, className }: ModelPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [error, setError] = useState("");
+  const sourceKey = file ? `${file.name}-${file.size}-${file.lastModified}` : src?.url ?? "";
 
   useEffect(() => {
     const container = containerRef.current;
@@ -23,16 +54,13 @@ export function ModelPreview({ file }: ModelPreviewProps) {
     const disposers: Array<() => void> = [];
 
     async function start() {
-      if (file.size > MAX_PREVIEW_BYTES) {
-        setStatus("error");
-        setError("This file is too large to preview in the browser.");
-        return;
-      }
-
       setStatus("loading");
       setError("");
 
       try {
+        const { buffer, name } = await readModelBytes(file, src);
+        if (cancelled) return;
+
         const THREE = await import("three");
         const { OrbitControls } = await import("three/addons/controls/OrbitControls.js");
         const { RoomEnvironment } = await import("three/addons/environments/RoomEnvironment.js");
@@ -42,10 +70,7 @@ export function ModelPreview({ file }: ModelPreviewProps) {
 
         if (cancelled || !container) return;
 
-        const buffer = await file.arrayBuffer();
-        if (cancelled) return;
-
-        const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+        const ext = name.split(".").pop()?.toLowerCase() ?? "";
         const width = Math.max(container.clientWidth, 1);
         const height = Math.max(container.clientHeight, Math.round(width * (10 / 16)), 1);
 
@@ -183,23 +208,86 @@ export function ModelPreview({ file }: ModelPreviewProps) {
       cancelled = true;
       while (disposers.length) disposers.pop()?.();
     };
-  }, [file]);
+  }, [file, sourceKey, src?.url, src?.name]);
 
   return (
-    <div className="mt-3 overflow-hidden rounded-lg border border-copper/20 bg-black">
+    <div className={`overflow-hidden rounded-lg border border-copper/20 bg-black ${className ?? "mt-3"}`}>
       <div className="relative">
-        <div ref={containerRef} className="aspect-[16/10] w-full" />
+        <div ref={containerRef} className="aspect-[16/10] min-h-[16rem] w-full" />
         {status !== "ready" ? (
           <div className="absolute inset-0 flex items-center justify-center px-4 text-center text-xs text-stone-400">
             {status === "loading" ? "Building copper preview…" : error}
           </div>
         ) : null}
       </div>
-        {status === "ready" ? (
-          <p className="border-t border-copper/10 px-3 py-2 text-xs text-stone-500">
-            Approximate copper look — not the plated result. Drag to rotate, scroll to zoom.
-          </p>
-        ) : null}
+      {status === "ready" ? (
+        <p className="border-t border-copper/10 px-3 py-2 text-xs text-stone-500">
+          Approximate copper look — not the plated result. Drag to rotate, scroll to zoom.
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+export function ModelPreviewModal({
+  open,
+  title,
+  file,
+  src,
+  onClose,
+}: {
+  open: boolean;
+  title: string;
+  file?: File;
+  src?: ModelPreviewSource;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    if (!open) return;
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    const previousOverflow = document.body.style.overflow;
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+    >
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/75"
+        onClick={onClose}
+        aria-label="Close preview"
+      />
+      <div className="relative z-10 w-full max-w-3xl overflow-hidden rounded-xl border border-copper/20 bg-charcoal shadow-2xl">
+        <div className="flex items-center justify-between gap-4 border-b border-copper/15 px-4 py-3">
+          <h2 className="truncate text-sm font-medium text-stone-100">{title}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="shrink-0 text-sm text-stone-400 hover:text-stone-100"
+          >
+            Close
+          </button>
+        </div>
+        <div className="p-3">
+          <ModelPreview file={file} src={src} className="mt-0" />
+        </div>
+      </div>
     </div>
   );
 }
