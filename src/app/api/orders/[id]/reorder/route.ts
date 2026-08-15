@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { calculateOrderTotal, generateOrderNumber, addStatusHistory } from "@/lib/orders";
+import { calculateOrderTotal, extractPostcodeFromAddress, generateOrderNumber, addStatusHistory } from "@/lib/orders";
 import { SHIPPING_COUNTRY } from "@/lib/constants";
 
 export async function POST(
@@ -29,7 +29,16 @@ export async function POST(
 
     const body = await request.json();
     const quantity = Number(body.quantity ?? 1);
-    const { unitPrice, totalPrice } = await calculateOrderTotal(quantity);
+    const postcode =
+      sourceOrder.shippingPostcode ?? extractPostcodeFromAddress(sourceOrder.shippingAddress);
+    if (!postcode) {
+      return NextResponse.json(
+        { error: "Original order has no postcode — place a new order with a delivery postcode" },
+        { status: 400 },
+      );
+    }
+
+    const { unitPrice, shippingPrice, totalPrice } = await calculateOrderTotal(quantity, postcode);
 
     const reorderFile = await prisma.uploadedFile.create({
       data: {
@@ -48,10 +57,12 @@ export async function POST(
         customerName: sourceOrder.customerName,
         customerEmail: sourceOrder.customerEmail,
         shippingAddress: sourceOrder.shippingAddress,
+        shippingPostcode: postcode,
         country: SHIPPING_COUNTRY,
         productOption: "cosmetic_copper",
         quantity,
         unitPrice,
+        shippingPrice,
         totalPrice,
         uploadedFileId: reorderFile.id,
         termsAccepted: true,

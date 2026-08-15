@@ -9,6 +9,8 @@ type CheckoutPreview = {
   orderNumber: string;
   productLabel: string;
   quantity: number;
+  unitPrice: number;
+  shippingPrice: number;
   totalPrice: number;
   paymentStatus: string;
   stripeConfigured: boolean;
@@ -122,7 +124,11 @@ export function PaymentConfirm() {
               <span>
                 {preview.productLabel} × {preview.quantity}
               </span>
-              <span>{formatAud(preview.totalPrice)}</span>
+              <span>{formatAud(preview.unitPrice * preview.quantity)}</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span>Shipping</span>
+              <span>{formatAud(preview.shippingPrice)}</span>
             </div>
             <div className="flex justify-between gap-4 border-t border-stone-700 pt-2 text-stone-100">
               <span className="font-medium">Total</span>
@@ -130,8 +136,8 @@ export function PaymentConfirm() {
             </div>
           </div>
           <p className="mt-4 text-sm text-stone-500">
-            Shipping is calculated separately and confirmed before production. After payment, your
-            file will be reviewed and you will be contacted if anything needs attention.
+            After payment, your file will be reviewed and you will be contacted if anything needs
+            attention.
           </p>
         </>
       ) : !loadError ? (

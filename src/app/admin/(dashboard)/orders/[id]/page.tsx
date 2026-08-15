@@ -14,10 +14,13 @@ type OrderDetail = {
   customerName: string;
   customerEmail: string;
   shippingAddress: string;
+  shippingPostcode?: string | null;
   country: string;
   productOption: string;
   quantity: number;
+  unitPrice: number;
   totalPrice: number;
+  shippingPrice?: number | null;
   paymentStatus: string;
   productionStatus: string;
   termsAccepted: boolean;
@@ -132,8 +135,17 @@ export default function AdminOrderDetailPage() {
             <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
               <div><dt className="text-stone-500">Product</dt><dd>{productLabel(order.productOption)}</dd></div>
               <div><dt className="text-stone-500">Quantity</dt><dd>{order.quantity}</dd></div>
-              <div><dt className="text-stone-500">Total</dt><dd>{formatAud(order.totalPrice)}</dd></div>
+              <div><dt className="text-stone-500">Product total</dt><dd>{formatAud(order.unitPrice * order.quantity)}</dd></div>
+              <div>
+                <dt className="text-stone-500">Shipping</dt>
+                <dd>{order.shippingPrice != null ? formatAud(order.shippingPrice) : "—"}</dd>
+              </div>
+              <div><dt className="text-stone-500">Order total</dt><dd>{formatAud(order.totalPrice)}</dd></div>
               <div><dt className="text-stone-500">Country</dt><dd>{order.country}</dd></div>
+              <div>
+                <dt className="text-stone-500">Postcode</dt>
+                <dd>{order.shippingPostcode ?? "—"}</dd>
+              </div>
             </dl>
             <p className="mt-4 text-sm text-stone-400">{order.shippingAddress}</p>
             <p className="mt-4 text-sm text-stone-500">

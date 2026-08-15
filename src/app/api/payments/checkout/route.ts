@@ -28,6 +28,8 @@ export async function GET(request: NextRequest) {
     orderNumber: order.orderNumber,
     productLabel: productLabel(order.productOption),
     quantity: order.quantity,
+    unitPrice: order.unitPrice,
+    shippingPrice: order.shippingPrice ?? 0,
     totalPrice: order.totalPrice,
     paymentStatus: order.paymentStatus,
     stripeConfigured: isStripeConfigured(),
@@ -67,24 +69,48 @@ export async function POST(request: NextRequest) {
     const stripe = getStripe();
     const appUrl = getAppUrl();
     const label = productLabel(order.productOption);
+    const shippingPrice = order.shippingPrice ?? 0;
+
+    const line_items: Array<{
+      quantity: number;
+      price_data: {
+        currency: string;
+        unit_amount: number;
+        product_data: { name: string; description?: string };
+      };
+    }> = [
+      {
+        quantity: order.quantity,
+        price_data: {
+          currency: "aud",
+          unit_amount: order.unitPrice,
+          product_data: {
+            name: label,
+            description: `Order ${order.orderNumber}`,
+          },
+        },
+      },
+    ];
+
+    if (shippingPrice > 0) {
+      line_items.push({
+        quantity: 1,
+        price_data: {
+          currency: "aud",
+          unit_amount: shippingPrice,
+          product_data: {
+            name: "Australia Post shipping",
+            description: `Order ${order.orderNumber}`,
+          },
+        },
+      });
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: order.customerEmail,
       client_reference_id: order.id,
-      line_items: [
-        {
-          quantity: order.quantity,
-          price_data: {
-            currency: "aud",
-            unit_amount: order.unitPrice,
-            product_data: {
-              name: label,
-              description: `Order ${order.orderNumber}`,
-            },
-          },
-        },
-      ],
+      line_items,
       metadata: {
         orderId: order.id,
         orderNumber: order.orderNumber,

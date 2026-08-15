@@ -15,6 +15,10 @@ export const orderSchema = z.object({
   customerName: z.string().min(2),
   customerEmail: z.string().email(),
   shippingAddress: z.string().min(5),
+  shippingPostcode: z
+    .string()
+    .trim()
+    .regex(/^\d{4}$/, "Enter a valid 4-digit Australian postcode"),
   country: z.literal("Australia", {
     message: "Shipping is currently available within Australia only",
   }),
@@ -25,6 +29,14 @@ export const orderSchema = z.object({
   customerNotes: z.string().max(2000).optional(),
   createAccount: z.boolean().optional(),
   password: z.string().optional(),
+});
+
+export const shippingQuoteSchema = z.object({
+  postcode: z
+    .string()
+    .trim()
+    .regex(/^\d{4}$/, "Enter a valid 4-digit Australian postcode"),
+  quantity: z.coerce.number().int().min(1).max(99).default(1),
 });
 
 export const orderStatusLookupSchema = z.object({

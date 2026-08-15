@@ -71,6 +71,7 @@ model Order {
   customerName                 String
   customerEmail                String
   shippingAddress              String
+  shippingPostcode             String?
   country                      String
   productOption                ProductOption
   quantity                     Int
