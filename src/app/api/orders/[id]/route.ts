@@ -69,7 +69,7 @@ export async function PATCH(
       );
     }
 
-    const order = await prisma.order.update({
+    await prisma.order.update({
       where: { id },
       data: {
         productionStatus: parsed.data.productionStatus,
@@ -81,11 +81,20 @@ export async function PATCH(
     });
 
     await addStatusHistory(
-      order.id,
+      id,
       parsed.data.productionStatus,
       parsed.data.statusNote,
       admin.email,
     );
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        uploadedFile: true,
+        statusHistory: { orderBy: { createdAt: "desc" } },
+        galleryItems: true,
+      },
+    });
 
     return NextResponse.json({ order });
   } catch {

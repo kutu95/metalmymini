@@ -25,8 +25,8 @@ type OrderDetail = {
   adminNotes?: string | null;
   customerNotes?: string | null;
   trackingNumber?: string | null;
-  uploadedFile: { id: string; originalFilename: string };
-  statusHistory: Array<{ status: string; note?: string | null; createdAt: string }>;
+  uploadedFile?: { id: string; originalFilename: string } | null;
+  statusHistory?: Array<{ status: string; note?: string | null; createdAt: string }>;
 };
 
 export default function AdminOrderDetailPage() {
@@ -47,6 +47,11 @@ export default function AdminOrderDetailPage() {
     fetch(`/api/orders/${params.id}`)
       .then((r) => r.json())
       .then((data) => {
+        if (!data.order) {
+          setOrder(null);
+          setMessage(data.error ?? "Unable to load order");
+          return;
+        }
         setOrder(data.order);
         setForm({
           productionStatus: data.order.productionStatus,
@@ -73,7 +78,16 @@ export default function AdminOrderDetailPage() {
       setMessage(data.error ?? "Unable to save");
       return;
     }
-    setOrder(data.order);
+    setOrder((current) => {
+      if (!data.order) return current;
+      if (!current) return data.order;
+      return {
+        ...current,
+        ...data.order,
+        uploadedFile: data.order.uploadedFile ?? current.uploadedFile,
+        statusHistory: data.order.statusHistory ?? current.statusHistory,
+      };
+    });
     setMessage("Order updated");
   }
 
@@ -101,8 +115,19 @@ export default function AdminOrderDetailPage() {
         <div className="space-y-6">
           <Card>
             <div className="flex flex-wrap gap-2">
-              <StatusBadge label={PAYMENT_STATUS_LABELS[order.paymentStatus as keyof typeof PAYMENT_STATUS_LABELS]} />
-              <StatusBadge label={PRODUCTION_STATUS_LABELS[order.productionStatus as keyof typeof PRODUCTION_STATUS_LABELS]} />
+              <StatusBadge
+                label={
+                  PAYMENT_STATUS_LABELS[order.paymentStatus as keyof typeof PAYMENT_STATUS_LABELS] ??
+                  order.paymentStatus
+                }
+              />
+              <StatusBadge
+                label={
+                  PRODUCTION_STATUS_LABELS[
+                    order.productionStatus as keyof typeof PRODUCTION_STATUS_LABELS
+                  ] ?? order.productionStatus
+                }
+              />
             </div>
             <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
               <div><dt className="text-stone-500">Product</dt><dd>{productLabel(order.productOption)}</dd></div>
@@ -115,20 +140,25 @@ export default function AdminOrderDetailPage() {
               Terms accepted: {order.termsAccepted ? "Yes" : "No"} · Gallery photos allowed:{" "}
               {order.publicGalleryConsentAccepted ? "Yes (default)" : "No — customer opted out"}
             </p>
-            <a
-              href={`/api/files/models/${order.uploadedFile.id}`}
-              className="mt-4 inline-block text-sm text-copper-light hover:underline"
-            >
-              Download {order.uploadedFile.originalFilename}
-            </a>
+            {order.uploadedFile ? (
+              <a
+                href={`/api/files/models/${order.uploadedFile.id}`}
+                className="mt-4 inline-block text-sm text-copper-light hover:underline"
+              >
+                Download {order.uploadedFile.originalFilename}
+              </a>
+            ) : (
+              <p className="mt-4 text-sm text-amber-300">Model file is missing for this order.</p>
+            )}
           </Card>
 
           <Card>
             <h2 className="text-lg font-medium">Status history</h2>
             <ul className="mt-3 space-y-2 text-sm text-stone-400">
-              {order.statusHistory.map((entry, index) => (
+              {(order.statusHistory ?? []).map((entry, index) => (
                 <li key={`${entry.createdAt}-${index}`}>
-                  {PRODUCTION_STATUS_LABELS[entry.status as keyof typeof PRODUCTION_STATUS_LABELS]} — {formatDateTime(entry.createdAt)}
+                  {PRODUCTION_STATUS_LABELS[entry.status as keyof typeof PRODUCTION_STATUS_LABELS] ?? entry.status} —{" "}
+                  {formatDateTime(entry.createdAt)}
                   {entry.note ? ` (${entry.note})` : ""}
                 </li>
               ))}
