@@ -25,6 +25,9 @@ export function Footer() {
           <Link href="/gallery" className="hover:text-copper-light">
             Gallery
           </Link>
+          <Link href="/blog" className="hover:text-copper-light">
+            Journal
+          </Link>
           <Link href="/order" className="hover:text-copper-light">
             Order
           </Link>

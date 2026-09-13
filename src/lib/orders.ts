@@ -2,12 +2,18 @@ import { prisma } from "@/lib/db";
 import { Prisma, ProductionStatus } from "@/generated/prisma/client";
 import { quoteDomesticParcel } from "@/lib/auspost";
 import { getActiveProduct } from "@/lib/products";
+import {
+  productNameWithOptions,
+  resolveSelectedOptions,
+  type SelectedOptionSnapshot,
+} from "@/lib/product-options";
 
 export const orderItemsInclude = {
   items: {
     orderBy: { sortOrder: "asc" as const },
     include: { uploadedFile: true },
   },
+  selectedOptions: { orderBy: { sortOrder: "asc" as const } },
 } satisfies Prisma.OrderInclude;
 
 export function generateOrderNumber() {
@@ -17,18 +23,30 @@ export function generateOrderNumber() {
   return `MMM-${date}-${rand}`;
 }
 
-export async function calculateOrderTotal(quantity: number, toPostcode: string, productId: string) {
+export async function calculateOrderTotal(
+  quantity: number,
+  toPostcode: string,
+  productId: string,
+  optionIds: string[] = [],
+) {
   const product = await getActiveProduct(productId);
   if (!product) {
     throw new Error("Selected product is not available");
   }
 
-  const unitPrice = product.priceCents;
+  const selectedOptions = resolveSelectedOptions(optionIds, {
+    optionGroups: product.optionGroups,
+    incompatibilities: product.incompatibilities,
+  });
+  const optionDelta = selectedOptions.reduce((sum, option) => sum + option.priceDeltaCents, 0);
+  const unitPrice = product.priceCents + optionDelta;
   const productTotal = unitPrice * quantity;
   const shipping = await quoteDomesticParcel({ toPostcode, quantity });
 
   return {
     product,
+    selectedOptions,
+    productName: productNameWithOptions(product.name, selectedOptions),
     unitPrice,
     productTotal,
     shippingPrice: shipping.amountCents,
@@ -36,6 +54,29 @@ export async function calculateOrderTotal(quantity: number, toPostcode: string, 
     shippingDeliveryTime: shipping.deliveryTime,
     totalPrice: productTotal + shipping.amountCents,
   };
+}
+
+export function parseOptionIds(raw: unknown): string[] {
+  if (Array.isArray(raw)) {
+    return raw.map((value) => String(value)).filter(Boolean);
+  }
+  if (typeof raw !== "string" || !raw.trim()) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((value) => String(value)).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+export function snapshotSelectedOptions(selectedOptions: SelectedOptionSnapshot[]) {
+  return selectedOptions.map((option) => ({
+    groupName: option.groupName,
+    optionName: option.optionName,
+    priceDeltaCents: option.priceDeltaCents,
+    sortOrder: option.sortOrder,
+  }));
 }
 
 /** Best-effort postcode from a stored address when shippingPostcode is missing. */

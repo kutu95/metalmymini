@@ -7,6 +7,7 @@ import { FormField, inputClassName, textareaClassName } from "@/components/forms
 import { ModelPreview } from "@/components/ModelPreview";
 import { LEGAL_CHECKOUT_TEXT, MAX_LINE_QUANTITY, MAX_ORDER_FILES, SHIPPING_COUNTRY } from "@/lib/constants";
 import { formatAud } from "@/lib/format";
+import { optionConflictsWith } from "@/lib/product-option-rules";
 
 type ModelLine = {
   id: string;
@@ -19,6 +20,23 @@ function newModelLine(): ModelLine {
   return { id: crypto.randomUUID(), quantity: 1, fileName: "", file: null };
 }
 
+type CatalogOption = {
+  id: string;
+  name: string;
+  description: string;
+  priceDeltaCents: number;
+  active: boolean;
+};
+
+type CatalogOptionGroup = {
+  id: string;
+  name: string;
+  description: string;
+  required: boolean;
+  active: boolean;
+  options: CatalogOption[];
+};
+
 type CatalogProduct = {
   id: string;
   name: string;
@@ -26,7 +44,28 @@ type CatalogProduct = {
   priceCents: number;
   priceDisplay: string;
   thumbnailUrl: string | null;
+  optionGroups?: CatalogOptionGroup[];
+  incompatibilities?: Array<{ optionAId: string; optionBId: string }>;
 };
+
+function defaultSelections(product: CatalogProduct | null): Record<string, string> {
+  if (!product) return {};
+  const groups = (product.optionGroups ?? []).filter((group) => group.active);
+  const incompatibilities = product.incompatibilities ?? [];
+  const selected: Record<string, string> = {};
+  const selectedIds: string[] = [];
+
+  for (const group of groups) {
+    const pick = group.options.find(
+      (option) => option.active && !optionConflictsWith(option.id, selectedIds, incompatibilities),
+    );
+    if (pick) {
+      selected[group.id] = pick.id;
+      selectedIds.push(pick.id);
+    }
+  }
+  return selected;
+}
 
 export function OrderForm() {
   const router = useRouter();
@@ -37,12 +76,19 @@ export function OrderForm() {
   const [createAccount, setCreateAccount] = useState(false);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [productId, setProductId] = useState("");
+  const [selectedByGroup, setSelectedByGroup] = useState<Record<string, string>>({});
   const [shippingPrice, setShippingPrice] = useState<number | null>(null);
   const [shippingLabel, setShippingLabel] = useState("Enter postcode for quote");
   const [quoting, setQuoting] = useState(false);
 
   const selected = products.find((p) => p.id === productId) ?? null;
-  const unitPrice = selected?.priceCents ?? 0;
+  const optionDelta = Object.values(selectedByGroup).reduce((sum, optionId) => {
+    const option = selected?.optionGroups
+      ?.flatMap((group) => group.options)
+      .find((item) => item.id === optionId);
+    return sum + (option?.priceDeltaCents ?? 0);
+  }, 0);
+  const unitPrice = (selected?.priceCents ?? 0) + optionDelta;
   const totalMinis = lines.reduce((sum, line) => sum + Math.max(0, line.quantity), 0);
   const productTotal = unitPrice * totalMinis;
   const totalPrice = productTotal + (shippingPrice ?? 0);
@@ -53,7 +99,10 @@ export function OrderForm() {
       .then((data) => {
         const list = (data.products ?? []) as CatalogProduct[];
         setProducts(list);
-        if (list[0]) setProductId(list[0].id);
+        if (list[0]) {
+          setProductId(list[0].id);
+          setSelectedByGroup(defaultSelections(list[0]));
+        }
       })
       .catch(() => setError("Unable to load products"));
   }, []);
@@ -109,6 +158,7 @@ export function OrderForm() {
     const form = event.currentTarget;
     const formData = new FormData(form);
     formData.set("productId", productId);
+    formData.set("optionIds", JSON.stringify(Object.values(selectedByGroup).filter(Boolean)));
     formData.set("country", SHIPPING_COUNTRY);
     formData.set("shippingPostcode", postcode);
     formData.set("termsAccepted", formData.get("termsAccepted") ? "true" : "false");
@@ -217,7 +267,10 @@ export function OrderForm() {
                   <button
                     key={product.id}
                     type="button"
-                    onClick={() => setProductId(product.id)}
+                    onClick={() => {
+                      setProductId(product.id);
+                      setSelectedByGroup(defaultSelections(product));
+                    }}
                     className={`flex gap-4 rounded-lg border p-3 text-left transition ${
                       selectedCard
                         ? "border-copper bg-copper/10"
@@ -246,6 +299,84 @@ export function OrderForm() {
             </div>
           )}
         </Card>
+
+        {(selected?.optionGroups ?? []).filter((group) => group.active && group.options.some((option) => option.active))
+          .length > 0 ? (
+          <Card>
+            <h2 className="text-lg font-medium text-stone-100">Finish options</h2>
+            <div className="mt-4 space-y-6">
+              {(selected?.optionGroups ?? [])
+                .filter((group) => group.active)
+                .map((group) => {
+                  const otherSelected = Object.entries(selectedByGroup)
+                    .filter(([groupId]) => groupId !== group.id)
+                    .map(([, optionId]) => optionId);
+                  return (
+                    <fieldset key={group.id}>
+                      <legend className="text-sm font-medium text-stone-200">
+                        {group.name}
+                        {group.required ? "" : " (optional)"}
+                      </legend>
+                      {group.description ? (
+                        <p className="mt-1 text-sm text-stone-500">{group.description}</p>
+                      ) : null}
+                      <div className="mt-3 grid gap-2">
+                        {group.options
+                          .filter((option) => option.active)
+                          .map((option) => {
+                            const blocked = optionConflictsWith(
+                              option.id,
+                              otherSelected,
+                              selected?.incompatibilities ?? [],
+                            );
+                            const checked = selectedByGroup[group.id] === option.id;
+                            return (
+                              <label
+                                key={option.id}
+                                className={`flex items-start gap-3 rounded-lg border px-3 py-2 text-sm ${
+                                  blocked
+                                    ? "cursor-not-allowed border-stone-800 text-stone-600"
+                                    : checked
+                                      ? "cursor-pointer border-copper bg-copper/10 text-stone-100"
+                                      : "cursor-pointer border-copper/20 text-stone-300 hover:border-copper/40"
+                                }`}
+                              >
+                                <input
+                                  type="radio"
+                                  name={`option-group-${group.id}`}
+                                  className="mt-1"
+                                  checked={checked}
+                                  disabled={blocked}
+                                  onChange={() =>
+                                    setSelectedByGroup((current) => ({ ...current, [group.id]: option.id }))
+                                  }
+                                />
+                                <span>
+                                  <span className="block font-medium">{option.name}</span>
+                                  {option.description ? (
+                                    <span className="mt-0.5 block text-stone-500">{option.description}</span>
+                                  ) : null}
+                                  <span className="mt-0.5 block text-copper-light">
+                                    {option.priceDeltaCents === 0
+                                      ? "Included"
+                                      : `${option.priceDeltaCents > 0 ? "+" : ""}${formatAud(option.priceDeltaCents)}`}
+                                  </span>
+                                  {blocked ? (
+                                    <span className="mt-0.5 block text-xs text-amber-300">
+                                      Cannot be combined with your other selection
+                                    </span>
+                                  ) : null}
+                                </span>
+                              </label>
+                            );
+                          })}
+                      </div>
+                    </fieldset>
+                  );
+                })}
+            </div>
+          </Card>
+        ) : null}
 
         <Card>
           <h2 className="text-lg font-medium text-stone-100">Shipping details</h2>
@@ -349,6 +480,19 @@ export function OrderForm() {
               <span>{selected?.name ?? "Finish"}</span>
               <span>{selected ? `${formatAud(unitPrice)} × ${totalMinis}` : "—"}</span>
             </div>
+            {Object.values(selectedByGroup).length > 0 ? (
+              <ul className="space-y-1 text-xs text-stone-500">
+                {(selected?.optionGroups ?? []).map((group) => {
+                  const option = group.options.find((item) => item.id === selectedByGroup[group.id]);
+                  if (!option) return null;
+                  return (
+                    <li key={group.id}>
+                      {group.name}: {option.name}
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : null}
             <div className="flex justify-between gap-4">
               <span>Shipping</span>
               <span className="text-right">

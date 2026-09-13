@@ -9,6 +9,7 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/gallery", label: "Gallery" },
+  { href: "/blog", label: "Journal" },
   { href: "/order", label: "Order" },
   { href: "/order/status", label: "Track Order" },
 ];
@@ -26,7 +27,10 @@ function NavLink({
   onClick?: () => void;
   className?: string;
 }) {
-  const active = pathname === href;
+  const active =
+    href === "/blog"
+      ? pathname === "/blog" || pathname.startsWith("/blog/")
+      : pathname === href;
   return (
     <Link
       href={href}

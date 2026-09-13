@@ -1,9 +1,16 @@
 import type { MetadataRoute } from "next";
+import { listAllPublishedPosts } from "@/lib/blog";
 
 const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "https://metalmymini.com").replace(/\/$/, "");
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
+  let posts: Awaited<ReturnType<typeof listAllPublishedPosts>> = [];
+  try {
+    posts = await listAllPublishedPosts();
+  } catch {
+    posts = [];
+  }
 
   return [
     {
@@ -43,6 +50,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/blog`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/blog/rss.xml`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.3,
+    },
+    {
       url: `${baseUrl}/order`,
       lastModified,
       changeFrequency: "monthly",
@@ -72,5 +91,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.2,
     },
+    ...posts.map((post) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: post.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
   ];
 }

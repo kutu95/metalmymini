@@ -67,6 +67,10 @@ type PageMetaInput = {
   description: string;
   path: string;
   noIndex?: boolean;
+  type?: "website" | "article";
+  image?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
 };
 
 export function createPageMetadata({
@@ -74,8 +78,17 @@ export function createPageMetadata({
   description,
   path,
   noIndex = false,
+  type = "website",
+  image,
+  publishedTime,
+  modifiedTime,
 }: PageMetaInput): Metadata {
   const url = `${SITE_URL}${path}`;
+  const ogImage = image
+    ? image.startsWith("http")
+      ? image
+      : `${SITE_URL}${image}`
+    : undefined;
 
   return {
     title,
@@ -88,13 +101,17 @@ export function createPageMetadata({
       description,
       url,
       siteName: SITE_NAME,
-      type: "website",
+      type,
       locale: "en_AU",
+      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+      ...(type === "article" && publishedTime ? { publishedTime } : {}),
+      ...(type === "article" && modifiedTime ? { modifiedTime } : {}),
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      ...(ogImage ? { images: [ogImage] } : {}),
     },
     robots: noIndex
       ? { index: false, follow: false }

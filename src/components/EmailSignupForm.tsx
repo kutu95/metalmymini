@@ -3,13 +3,16 @@
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui";
 import { inputClassName } from "@/components/forms";
+import type { SubscribeSource } from "@/lib/validators";
 
 export function EmailSignupForm({
   source,
   buttonLabel = "Notify me",
+  successDetail = "I'll be in touch when there's news worth sharing.",
 }: {
-  source: "footer" | "home" | "other";
+  source: SubscribeSource;
   buttonLabel?: string;
+  successDetail?: string;
 }) {
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
@@ -54,9 +57,7 @@ export function EmailSignupForm({
         aria-live="polite"
       >
         <p className="font-medium text-stone-100">{heading}</p>
-        <p className="mt-1 text-sm text-stone-400">
-          I&apos;ll be in touch when there&apos;s news worth sharing.
-        </p>
+        <p className="mt-1 text-sm text-stone-400">{successDetail}</p>
       </div>
     );
   }

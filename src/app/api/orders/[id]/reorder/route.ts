@@ -4,6 +4,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { calculateOrderTotal, extractPostcodeFromAddress, generateOrderNumber, addStatusHistory, orderItemsInclude } from "@/lib/orders";
 import { copyStoredModelFile } from "@/lib/storage";
 import { SHIPPING_COUNTRY } from "@/lib/constants";
+import { isOrderingPaused } from "@/lib/site-settings";
+import { getActiveProduct } from "@/lib/products";
 
 export async function POST(
   _request: NextRequest,
@@ -13,6 +15,13 @@ export async function POST(
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Login required" }, { status: 401 });
+    }
+
+    if (await isOrderingPaused()) {
+      return NextResponse.json(
+        { error: "Ordering is paused. New orders are not being accepted." },
+        { status: 503 },
+      );
     }
 
     const { id } = await params;
@@ -49,11 +58,29 @@ export async function POST(
     }
 
     const totalMinis = sourceOrder.items.reduce((sum, item) => sum + item.quantity, 0);
-    const { product, unitPrice, shippingPrice, totalPrice } = await calculateOrderTotal(
-      totalMinis,
-      postcode,
-      sourceOrder.productId,
-    );
+    const currentProduct = await getActiveProduct(sourceOrder.productId);
+    if (!currentProduct) {
+      return NextResponse.json(
+        { error: "Original product is no longer available — place a new order" },
+        { status: 400 },
+      );
+    }
+
+    const optionIds: string[] = [];
+    for (const snapshot of sourceOrder.selectedOptions) {
+      const group = currentProduct.optionGroups.find((item) => item.name === snapshot.groupName);
+      const option = group?.options.find((item) => item.name === snapshot.optionName);
+      if (!option) {
+        return NextResponse.json(
+          { error: "Original finish options are no longer available — place a new order" },
+          { status: 400 },
+        );
+      }
+      optionIds.push(option.id);
+    }
+
+    const { product, selectedOptions, productName, unitPrice, shippingPrice, totalPrice } =
+      await calculateOrderTotal(totalMinis, postcode, sourceOrder.productId, optionIds);
 
     const copiedItems = [];
     for (const [sortOrder, item] of sourceOrder.items.entries()) {
@@ -76,7 +103,7 @@ export async function POST(
         shippingPostcode: postcode,
         country: SHIPPING_COUNTRY,
         productId: product.id,
-        productName: product.name,
+        productName,
         quantity: totalMinis,
         unitPrice,
         shippingPrice,
@@ -86,6 +113,7 @@ export async function POST(
         paymentStatus: "unpaid",
         productionStatus: "submitted",
         items: { create: copiedItems },
+        selectedOptions: { create: selectedOptions },
       },
     });
 

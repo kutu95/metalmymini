@@ -1,5 +1,6 @@
 import { BUSINESS_LOCATION_DISPLAY, SITE_NAME, SITE_NAME_ALT, SITE_URL } from "@/lib/seo";
 import { listProducts } from "@/lib/products";
+import { listAllPublishedPosts } from "@/lib/blog";
 
 export async function getLlmsTxt(): Promise<string> {
   const products = await listProducts({ activeOnly: true });
@@ -12,6 +13,19 @@ export async function getLlmsTxt(): Promise<string> {
           )
           .join("\n")
       : "- Finishes are listed on the order page";
+
+  let postLines = "- No published posts yet";
+  try {
+    const posts = await listAllPublishedPosts();
+    if (posts.length > 0) {
+      postLines = posts
+        .slice(0, 50)
+        .map((post) => `- ${post.title}: ${SITE_URL}/blog/${post.slug}`)
+        .join("\n");
+    }
+  } catch {
+    postLines = "- Journal: " + `${SITE_URL}/blog`;
+  }
 
   return `# ${SITE_NAME}
 
@@ -45,7 +59,13 @@ ${finishLines}
 - Privacy: ${SITE_URL}/privacy
 - Terms of Service: ${SITE_URL}/terms
 - Gallery: ${SITE_URL}/gallery
+- Journal: ${SITE_URL}/blog
+- Journal RSS: ${SITE_URL}/blog/rss.xml
 - Sitemap: ${SITE_URL}/sitemap.xml
+
+## Journal
+
+${postLines}
 
 ## Contact and orders
 

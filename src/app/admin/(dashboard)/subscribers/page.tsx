@@ -89,7 +89,15 @@ export default function AdminSubscribersPage() {
                   <tr key={subscriber.id} className="border-b border-stone-800">
                     <td className="px-3 py-2 text-stone-200">{subscriber.email}</td>
                     <td className="px-3 py-2">{subscriber.firstName ?? "—"}</td>
-                    <td className="px-3 py-2">{subscriber.source ?? "—"}</td>
+                    <td className="px-3 py-2">
+                      {subscriber.source === "order_waitlist" ? (
+                        <span className="rounded-full border border-copper/30 bg-copper/10 px-2 py-0.5 text-xs text-copper-light">
+                          Order waitlist
+                        </span>
+                      ) : (
+                        (subscriber.source ?? "—")
+                      )}
+                    </td>
                     <td className="px-3 py-2">{formatDateTime(subscriber.subscribedAt)}</td>
                     <td className="px-3 py-2">
                       {subscriber.unsubscribedAt ? "Unsubscribed" : "Active"}

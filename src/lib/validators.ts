@@ -24,6 +24,7 @@ export const orderSchema = z.object({
     message: "Shipping is currently available within Australia only",
   }),
   productId: z.string().min(1, "Select a product"),
+  optionIds: z.array(z.string().min(1)).optional().default([]),
   termsAccepted: z.literal(true, { message: "You must accept the terms" }),
   publicGalleryConsentAccepted: z.boolean().optional().default(true),
   customerNotes: z.string().max(2000).optional(),
@@ -88,6 +89,24 @@ export const heroRotationSchema = z.object({
   heroRotationSeconds: z.coerce.number().min(1).max(60),
 });
 
+export const siteSettingsPatchSchema = z
+  .object({
+    heroRotationSeconds: z.coerce.number().min(1).max(60).optional(),
+    bannerEnabled: z.boolean().optional(),
+    bannerMessage: z.string().max(2000).optional(),
+    orderingPaused: z.boolean().optional(),
+    orderingPausedMessage: z.string().max(2000).optional(),
+  })
+  .refine(
+    (data) =>
+      data.heroRotationSeconds !== undefined ||
+      data.bannerEnabled !== undefined ||
+      data.bannerMessage !== undefined ||
+      data.orderingPaused !== undefined ||
+      data.orderingPausedMessage !== undefined,
+    { message: "No settings provided" },
+  );
+
 export const productSchema = z.object({
   name: z.string().trim().min(2).max(80),
   description: z.string().trim().max(1000).optional().default(""),
@@ -100,6 +119,49 @@ export const productSchema = z.object({
 export const productUpdateSchema = productSchema.partial().extend({
   active: z.boolean().optional(),
 });
+
+export const optionGroupSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  description: z.string().trim().max(500).optional().default(""),
+  required: z.boolean().optional().default(true),
+  sortOrder: z.coerce.number().int().min(0).max(9999).optional().default(0),
+  active: z.boolean().optional().default(true),
+});
+
+export const optionGroupUpdateSchema = optionGroupSchema.partial();
+
+export const productOptionSchema = z.object({
+  name: z.string().trim().min(1).max(80),
+  description: z.string().trim().max(500).optional().default(""),
+  priceDeltaAud: z.coerce.number().min(-5000).max(5000).optional().default(0),
+  sortOrder: z.coerce.number().int().min(0).max(9999).optional().default(0),
+  active: z.boolean().optional().default(true),
+});
+
+export const productOptionUpdateSchema = productOptionSchema.partial();
+
+export const incompatibilitySchema = z.object({
+  optionAId: z.string().min(1),
+  optionBId: z.string().min(1),
+});
+
+export const blogPostSchema = z.object({
+  title: z.string().trim().min(2).max(160),
+  slug: z
+    .string()
+    .trim()
+    .min(2)
+    .max(80)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use a lowercase slug with hyphens"),
+  excerpt: z.string().trim().max(400).optional().default(""),
+  content: z.string().max(500_000).optional().default(""),
+  coverImagePath: z.string().nullable().optional(),
+  status: z.enum(["draft", "published"]).optional().default("draft"),
+  seoTitle: z.string().trim().max(70).optional().nullable(),
+  seoDescription: z.string().trim().max(180).optional().nullable(),
+});
+
+export const blogPostUpdateSchema = blogPostSchema.partial();
 
 export const orderLineQuantitySchema = z.coerce.number().int().min(1).max(MAX_LINE_QUANTITY);
 
@@ -124,8 +186,11 @@ export function parseOrderModelLines(formData: FormData) {
   return lines;
 }
 
+export const subscribeSources = ["footer", "home", "other", "order_waitlist"] as const;
+export type SubscribeSource = (typeof subscribeSources)[number];
+
 export const subscribeSchema = z.object({
   email: z.string().email(),
   firstName: z.string().trim().min(1).max(80).optional(),
-  source: z.enum(["footer", "home", "other"]).optional(),
+  source: z.enum(subscribeSources).optional(),
 });

@@ -44,6 +44,13 @@ enum ProductionStatus {
   @@schema("metal")
 }
 
+enum BlogPostStatus {
+  draft
+  published
+
+  @@schema("metal")
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -57,19 +64,67 @@ model User {
 }
 
 model Product {
-  id            String        @id @default(cuid())
+  id            String               @id @default(cuid())
   name          String
-  description   String        @default("")
+  description   String               @default("")
   priceCents    Int
-  active        Boolean       @default(true)
-  sortOrder     Int           @default(0)
-  galleryItemId String?       @unique
-  galleryItem   GalleryItem?  @relation("ProductThumbnail", fields: [galleryItemId], references: [id], onDelete: SetNull)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  active        Boolean              @default(true)
+  sortOrder     Int                  @default(0)
+  galleryItemId String?              @unique
+  galleryItem   GalleryItem?         @relation("ProductThumbnail", fields: [galleryItemId], references: [id], onDelete: SetNull)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
   orders        Order[]
-  galleryItems  GalleryItem[] @relation("GalleryProduct")
+  galleryItems  GalleryItem[]        @relation("GalleryProduct")
+  optionGroups  ProductOptionGroup[]
 
+  @@schema("metal")
+}
+
+model ProductOptionGroup {
+  id          String          @id @default(cuid())
+  productId   String
+  product     Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name        String
+  description String          @default("")
+  required    Boolean         @default(true)
+  sortOrder   Int             @default(0)
+  active      Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  options     ProductOption[]
+
+  @@index([productId])
+  @@schema("metal")
+}
+
+model ProductOption {
+  id                  String                         @id @default(cuid())
+  groupId             String
+  group               ProductOptionGroup             @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  name                String
+  description         String                         @default("")
+  priceDeltaCents     Int                            @default(0)
+  sortOrder           Int                            @default(0)
+  active              Boolean                        @default(true)
+  createdAt           DateTime                       @default(now())
+  updatedAt           DateTime                       @updatedAt
+  incompatibilitiesA  ProductOptionIncompatibility[] @relation("IncompatibilityA")
+  incompatibilitiesB  ProductOptionIncompatibility[] @relation("IncompatibilityB")
+
+  @@index([groupId])
+  @@schema("metal")
+}
+
+model ProductOptionIncompatibility {
+  id        String        @id @default(cuid())
+  optionAId String
+  optionBId String
+  optionA   ProductOption @relation("IncompatibilityA", fields: [optionAId], references: [id], onDelete: Cascade)
+  optionB   ProductOption @relation("IncompatibilityB", fields: [optionBId], references: [id], onDelete: Cascade)
+
+  @@unique([optionAId, optionBId])
+  @@index([optionBId])
   @@schema("metal")
 }
 
@@ -102,6 +157,7 @@ model Order {
   createdAt                    DateTime             @default(now())
   updatedAt                    DateTime             @updatedAt
   items                        OrderItem[]
+  selectedOptions              OrderSelectedOption[]
   statusHistory                OrderStatusHistory[]
   galleryItems                 GalleryItem[]
 
@@ -117,6 +173,19 @@ model OrderItem {
   quantity       Int
   sortOrder      Int          @default(0)
   createdAt      DateTime     @default(now())
+
+  @@index([orderId])
+  @@schema("metal")
+}
+
+model OrderSelectedOption {
+  id              String @id @default(cuid())
+  orderId         String
+  order           Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  groupName       String
+  optionName      String
+  priceDeltaCents Int    @default(0)
+  sortOrder       Int    @default(0)
 
   @@index([orderId])
   @@schema("metal")
@@ -189,5 +258,24 @@ model OrderStatusHistory {
   createdAt DateTime         @default(now())
   createdBy String?
 
+  @@schema("metal")
+}
+
+model BlogPost {
+  id             String         @id @default(cuid())
+  title          String
+  slug           String         @unique
+  excerpt        String         @default("")
+  content        String         @default("")
+  coverImagePath String?
+  status         BlogPostStatus @default(draft)
+  publishedAt    DateTime?
+  seoTitle       String?
+  seoDescription String?
+  authorName     String         @default("Shay")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([status, publishedAt])
   @@schema("metal")
 }

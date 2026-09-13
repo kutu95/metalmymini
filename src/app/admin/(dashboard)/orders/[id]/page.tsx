@@ -29,6 +29,7 @@ type OrderDetail = {
   adminNotes?: string | null;
   customerNotes?: string | null;
   trackingNumber?: string | null;
+  selectedOptions?: Array<{ groupName: string; optionName: string; priceDeltaCents: number }>;
   items?: Array<{
     id: string;
     quantity: number;
@@ -140,6 +141,16 @@ export default function AdminOrderDetailPage() {
             </div>
             <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
               <div><dt className="text-stone-500">Product</dt><dd>{order.productName}</dd></div>
+              {order.selectedOptions && order.selectedOptions.length > 0 ? (
+                <div className="md:col-span-2">
+                  <dt className="text-stone-500">Finish options</dt>
+                  <dd>
+                    {order.selectedOptions
+                      .map((option) => `${option.groupName}: ${option.optionName}`)
+                      .join(" · ")}
+                  </dd>
+                </div>
+              ) : null}
               <div><dt className="text-stone-500">Minis</dt><dd>{order.quantity}</dd></div>
               <div><dt className="text-stone-500">Product total</dt><dd>{formatAud(order.unitPrice * order.quantity)}</dd></div>
               <div>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button, Card, PageHeading } from "@/components/ui";
 import { FormField, inputClassName, textareaClassName } from "@/components/forms";
 import { formatAud } from "@/lib/format";
+import { ProductOptionsEditor, type CatalogOptionGroup, type IncompatibilityPair } from "@/components/ProductOptionsEditor";
 
 type Product = {
   id: string;
@@ -16,6 +17,8 @@ type Product = {
   sortOrder: number;
   galleryItemId: string | null;
   thumbnailUrl: string | null;
+  optionGroups: CatalogOptionGroup[];
+  incompatibilities: IncompatibilityPair[];
 };
 
 type GalleryItem = {
@@ -276,6 +279,21 @@ export default function AdminPricingPage() {
               {saving ? "Saving..." : editingId ? "Save changes" : "Create product"}
             </Button>
           </form>
+          {editingId ? (
+            <ProductOptionsEditor
+              product={products.find((product) => product.id === editingId) ?? {
+                id: editingId,
+                name: form.name,
+                optionGroups: [],
+                incompatibilities: [],
+              }}
+              onProductChange={(updated) => {
+                setProducts((current) =>
+                  current.map((product) => (product.id === updated.id ? { ...product, ...updated } : product)),
+                );
+              }}
+            />
+          ) : null}
           {message ? <p className="mt-4 text-sm text-copper-light">{message}</p> : null}
         </Card>
       </div>

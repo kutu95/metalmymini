@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { formatPriceDisplay } from "@/lib/site-settings";
+import { listProductCatalog, type CatalogOptionGroup, type IncompatibilityPair } from "@/lib/product-options";
 
 export type ProductWithThumbnail = {
   id: string;
@@ -11,18 +12,23 @@ export type ProductWithThumbnail = {
   sortOrder: number;
   galleryItemId: string | null;
   thumbnailUrl: string | null;
+  optionGroups: CatalogOptionGroup[];
+  incompatibilities: IncompatibilityPair[];
 };
 
-function mapProduct(product: {
-  id: string;
-  name: string;
-  description: string;
-  priceCents: number;
-  active: boolean;
-  sortOrder: number;
-  galleryItemId: string | null;
-  galleryItem?: { imagePath: string } | null;
-}): ProductWithThumbnail {
+function mapProduct(
+  product: {
+    id: string;
+    name: string;
+    description: string;
+    priceCents: number;
+    active: boolean;
+    sortOrder: number;
+    galleryItemId: string | null;
+    galleryItem?: { imagePath: string } | null;
+  },
+  catalog: { optionGroups: CatalogOptionGroup[]; incompatibilities: IncompatibilityPair[] },
+): ProductWithThumbnail {
   return {
     id: product.id,
     name: product.name,
@@ -35,6 +41,8 @@ function mapProduct(product: {
     thumbnailUrl: product.galleryItem
       ? `/api/files/gallery/${product.galleryItem.imagePath}`
       : null,
+    optionGroups: catalog.optionGroups,
+    incompatibilities: catalog.incompatibilities,
   };
 }
 
@@ -44,7 +52,11 @@ export async function listProducts(options?: { activeOnly?: boolean; admin?: boo
     include: { galleryItem: true },
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
   });
-  return products.map(mapProduct);
+  return Promise.all(
+    products.map(async (product) =>
+      mapProduct(product, await listProductCatalog(product.id, { admin: options?.admin })),
+    ),
+  );
 }
 
 export async function getActiveProduct(productId: string) {
@@ -52,13 +64,15 @@ export async function getActiveProduct(productId: string) {
     where: { id: productId, active: true },
     include: { galleryItem: true },
   });
-  return product ? mapProduct(product) : null;
+  if (!product) return null;
+  return mapProduct(product, await listProductCatalog(product.id));
 }
 
-export async function getProductById(productId: string) {
+export async function getProductById(productId: string, options?: { admin?: boolean }) {
   const product = await prisma.product.findUnique({
     where: { id: productId },
     include: { galleryItem: true },
   });
-  return product ? mapProduct(product) : null;
+  if (!product) return null;
+  return mapProduct(product, await listProductCatalog(product.id, { admin: options?.admin }));
 }

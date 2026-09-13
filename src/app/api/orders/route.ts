@@ -3,8 +3,9 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { hashPassword } from "@/lib/auth";
 import { saveModelFile } from "@/lib/storage";
-import { addStatusHistory, calculateOrderTotal, generateOrderNumber, orderItemsInclude } from "@/lib/orders";
+import { addStatusHistory, calculateOrderTotal, generateOrderNumber, orderItemsInclude, parseOptionIds } from "@/lib/orders";
 import { SHIPPING_COUNTRY } from "@/lib/constants";
+import { isOrderingPaused } from "@/lib/site-settings";
 import { orderSchema, orderStatusLookupSchema, parseOrderModelLines } from "@/lib/validators";
 
 export async function GET(request: NextRequest) {
@@ -51,6 +52,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    if (await isOrderingPaused()) {
+      return NextResponse.json(
+        { error: "Ordering is paused. New orders are not being accepted." },
+        { status: 503 },
+      );
+    }
+
     const formData = await request.formData();
     const lines = parseOrderModelLines(formData);
     const totalMinis = lines.reduce((sum, line) => sum + line.quantity, 0);
@@ -62,6 +70,7 @@ export async function POST(request: NextRequest) {
       shippingPostcode: String(formData.get("shippingPostcode") ?? ""),
       country: SHIPPING_COUNTRY,
       productId: String(formData.get("productId") ?? ""),
+      optionIds: parseOptionIds(formData.get("optionIds")),
       termsAccepted: formData.get("termsAccepted") === "true",
       publicGalleryConsentAccepted: true,
       customerNotes: String(formData.get("customerNotes") ?? "").trim() || undefined,
@@ -96,11 +105,13 @@ export async function POST(request: NextRequest) {
       userId = user.id;
     }
 
-    const { product, unitPrice, shippingPrice, totalPrice } = await calculateOrderTotal(
-      totalMinis,
-      parsed.data.shippingPostcode,
-      parsed.data.productId,
-    );
+    const { product, selectedOptions, productName, unitPrice, shippingPrice, totalPrice } =
+      await calculateOrderTotal(
+        totalMinis,
+        parsed.data.shippingPostcode,
+        parsed.data.productId,
+        parsed.data.optionIds,
+      );
 
     const savedLines = [];
     for (const line of lines) {
@@ -119,7 +130,7 @@ export async function POST(request: NextRequest) {
         shippingPostcode: parsed.data.shippingPostcode,
         country: SHIPPING_COUNTRY,
         productId: product.id,
-        productName: product.name,
+        productName,
         quantity: totalMinis,
         unitPrice,
         shippingPrice,
@@ -137,6 +148,9 @@ export async function POST(request: NextRequest) {
             quantity: line.quantity,
             sortOrder,
           })),
+        },
+        selectedOptions: {
+          create: selectedOptions,
         },
       },
     });
