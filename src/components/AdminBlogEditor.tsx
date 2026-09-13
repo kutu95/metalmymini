@@ -21,9 +21,16 @@ type BlogPost = {
   content: string;
   coverImagePath: string | null;
   status: "draft" | "published";
+  publishedAt: string | null;
   seoTitle: string | null;
   seoDescription: string | null;
 };
+
+function toDateInputValue(value: string | Date | null | undefined) {
+  if (!value) return "";
+  const iso = value instanceof Date ? value.toISOString() : value;
+  return iso.slice(0, 10);
+}
 
 function ToolbarButton({
   onClick,
@@ -62,6 +69,7 @@ export function AdminBlogEditor({ post }: { post?: BlogPost }) {
     status: post?.status ?? "draft",
     seoTitle: post?.seoTitle ?? "",
     seoDescription: post?.seoDescription ?? "",
+    publishedAt: toDateInputValue(post?.publishedAt),
   });
 
   const editor = useEditor({
@@ -139,6 +147,7 @@ export function AdminBlogEditor({ post }: { post?: BlogPost }) {
       content: editor.getHTML(),
       coverImagePath: form.coverImagePath || null,
       status,
+      publishedAt: form.publishedAt || null,
       seoTitle: form.seoTitle || null,
       seoDescription: form.seoDescription || null,
     };
@@ -154,7 +163,12 @@ export function AdminBlogEditor({ post }: { post?: BlogPost }) {
       setMessage(data.error ?? "Unable to save");
       return;
     }
-    setForm((current) => ({ ...current, status, slug: data.post.slug }));
+    setForm((current) => ({
+      ...current,
+      status,
+      slug: data.post.slug,
+      publishedAt: toDateInputValue(data.post.publishedAt) || current.publishedAt,
+    }));
     setMessage(status === "published" ? "Published." : "Draft saved.");
     if (!post && data.post?.id) {
       router.replace(`/admin/blog/${data.post.id}`);
@@ -191,6 +205,17 @@ export function AdminBlogEditor({ post }: { post?: BlogPost }) {
             setForm({ ...form, slug: e.target.value });
           }}
           required
+          className={inputClassName}
+        />
+      </FormField>
+      <FormField
+        label="Publish date"
+        hint="Controls display order on the journal. Leave blank to use the time of publishing."
+      >
+        <input
+          type="date"
+          value={form.publishedAt}
+          onChange={(e) => setForm({ ...form, publishedAt: e.target.value })}
           className={inputClassName}
         />
       </FormField>

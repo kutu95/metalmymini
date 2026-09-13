@@ -57,6 +57,35 @@ export async function listAdminPosts() {
   });
 }
 
+export function resolveBlogPublishedAt({
+  status,
+  requested,
+  existing = null,
+}: {
+  status: "draft" | "published";
+  requested?: Date | null;
+  existing?: Date | null;
+}): Date | null {
+  if (status === "published") {
+    if (requested) {
+      if (existing && requested.toISOString().slice(0, 10) === existing.toISOString().slice(0, 10)) {
+        return existing;
+      }
+      return requested;
+    }
+    return existing ?? new Date();
+  }
+
+  if (requested !== undefined) {
+    if (requested && existing && requested.toISOString().slice(0, 10) === existing.toISOString().slice(0, 10)) {
+      return existing;
+    }
+    return requested;
+  }
+
+  return existing;
+}
+
 export function getBlogPostingJsonLd(post: BlogPost) {
   const url = `${SITE_URL}/blog/${post.slug}`;
   const image = blogCoverUrl(post);

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button, Card, PageHeading } from "@/components/ui";
-import { formatDateTime } from "@/lib/format";
+import { formatDate, formatDateTime } from "@/lib/format";
 
 type BlogPost = {
   id: string;
@@ -67,8 +67,11 @@ export default function AdminBlogPage() {
                     {post.title}
                   </Link>
                   <p className="mt-1 text-xs text-stone-500">
-                    /blog/{post.slug} · {post.status === "published" ? "Published" : "Draft"} ·{" "}
-                    {formatDateTime(post.updatedAt)}
+                    /blog/{post.slug} · {post.status === "published" ? "Published" : "Draft"}
+                    {post.status === "published" && post.publishedAt
+                      ? ` ${formatDate(post.publishedAt)}`
+                      : ""}{" "}
+                    · Updated {formatDateTime(post.updatedAt)}
                   </p>
                 </div>
                 <div className="flex gap-2">

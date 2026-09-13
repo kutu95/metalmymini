@@ -28,6 +28,7 @@ export default async function EditBlogPostPage({
           content: post.content,
           coverImagePath: post.coverImagePath,
           status: post.status,
+          publishedAt: post.publishedAt?.toISOString() ?? null,
           seoTitle: post.seoTitle,
           seoDescription: post.seoDescription,
         }}

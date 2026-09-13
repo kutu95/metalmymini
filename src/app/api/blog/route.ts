@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
-import { listAdminPosts, listPublishedPosts } from "@/lib/blog";
+import { listAdminPosts, listPublishedPosts, resolveBlogPublishedAt } from "@/lib/blog";
 import { sanitizeBlogHtml, slugify } from "@/lib/blog-html";
-import { blogPostSchema } from "@/lib/validators";
+import { blogPostSchema, parseBlogPublishedAt } from "@/lib/validators";
 
 async function uniqueSlug(desired: string, excludeId?: string) {
   const base = slugify(desired);
@@ -55,7 +55,10 @@ export async function POST(request: NextRequest) {
         content: sanitizeBlogHtml(parsed.data.content ?? ""),
         coverImagePath: parsed.data.coverImagePath ?? null,
         status,
-        publishedAt: status === "published" ? new Date() : null,
+        publishedAt: resolveBlogPublishedAt({
+          status,
+          requested: parseBlogPublishedAt(parsed.data.publishedAt),
+        }),
         seoTitle: parsed.data.seoTitle || null,
         seoDescription: parsed.data.seoDescription || null,
       },

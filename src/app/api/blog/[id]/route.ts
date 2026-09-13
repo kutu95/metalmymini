@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
+import { resolveBlogPublishedAt } from "@/lib/blog";
 import { sanitizeBlogHtml, slugify } from "@/lib/blog-html";
-import { blogPostUpdateSchema } from "@/lib/validators";
+import { blogPostUpdateSchema, parseBlogPublishedAt } from "@/lib/validators";
 
 async function uniqueSlug(desired: string, excludeId: string) {
   const base = slugify(desired);
@@ -54,10 +55,8 @@ export async function PATCH(
     }
 
     const status = parsed.data.status ?? existing.status;
-    const publishedAt =
-      status === "published"
-        ? existing.publishedAt ?? new Date()
-        : null;
+    const shouldUpdatePublishedAt =
+      parsed.data.publishedAt !== undefined || parsed.data.status !== undefined;
 
     const post = await prisma.blogPost.update({
       where: { id },
@@ -68,7 +67,15 @@ export async function PATCH(
         ...(parsed.data.content !== undefined ? { content: sanitizeBlogHtml(parsed.data.content) } : {}),
         ...(parsed.data.coverImagePath !== undefined ? { coverImagePath: parsed.data.coverImagePath } : {}),
         ...(parsed.data.status !== undefined ? { status } : {}),
-        ...(parsed.data.status !== undefined ? { publishedAt } : {}),
+        ...(shouldUpdatePublishedAt
+          ? {
+              publishedAt: resolveBlogPublishedAt({
+                status,
+                requested: parseBlogPublishedAt(parsed.data.publishedAt),
+                existing: existing.publishedAt,
+              }),
+            }
+          : {}),
         ...(parsed.data.seoTitle !== undefined ? { seoTitle: parsed.data.seoTitle || null } : {}),
         ...(parsed.data.seoDescription !== undefined
           ? { seoDescription: parsed.data.seoDescription || null }

@@ -145,6 +145,26 @@ export const incompatibilitySchema = z.object({
   optionBId: z.string().min(1),
 });
 
+const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
+
+function isValidBlogPublishedAt(value: string | null | undefined) {
+  if (value == null || value.trim() === "") return true;
+  const trimmed = value.trim();
+  const date = DATE_ONLY.test(trimmed) ? new Date(`${trimmed}T00:00:00.000Z`) : new Date(trimmed);
+  return !Number.isNaN(date.getTime());
+}
+
+export function parseBlogPublishedAt(value: string | null | undefined): Date | null | undefined {
+  if (value === undefined) return undefined;
+  if (value === null || value.trim() === "") return null;
+  const trimmed = value.trim();
+  const date = DATE_ONLY.test(trimmed) ? new Date(`${trimmed}T00:00:00.000Z`) : new Date(trimmed);
+  if (Number.isNaN(date.getTime())) {
+    throw new Error("Invalid publish date");
+  }
+  return date;
+}
+
 export const blogPostSchema = z.object({
   title: z.string().trim().min(2).max(160),
   slug: z
@@ -157,6 +177,10 @@ export const blogPostSchema = z.object({
   content: z.string().max(500_000).optional().default(""),
   coverImagePath: z.string().nullable().optional(),
   status: z.enum(["draft", "published"]).optional().default("draft"),
+  publishedAt: z
+    .union([z.string(), z.null()])
+    .optional()
+    .refine(isValidBlogPublishedAt, "Invalid publish date"),
   seoTitle: z.string().trim().max(70).optional().nullable(),
   seoDescription: z.string().trim().max(180).optional().nullable(),
 });
