@@ -7,6 +7,7 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
+import Youtube from "@tiptap/extension-youtube";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui";
 import { FormField, inputClassName, textareaClassName } from "@/components/forms";
@@ -71,6 +72,14 @@ export function AdminBlogEditor({ post }: { post?: BlogPost }) {
       Image.configure({ allowBase64: false }),
       Link.configure({ openOnClick: false, autolink: true }),
       Placeholder.configure({ placeholder: "Write the article…" }),
+      Youtube.configure({
+        nocookie: true,
+        modestBranding: true,
+        controls: true,
+        rel: 0,
+        width: 640,
+        height: 360,
+      }),
     ],
     content: post?.content || "<p></p>",
     editorProps: {
@@ -279,9 +288,24 @@ export function AdminBlogEditor({ post }: { post?: BlogPost }) {
               Link
             </ToolbarButton>
             <ToolbarButton onClick={() => fileInput.current?.click()}>Image</ToolbarButton>
+            <ToolbarButton
+              onClick={() => {
+                const src = window.prompt("Paste a YouTube link");
+                if (!src?.trim() || !editor) return;
+                const inserted = editor.chain().focus().setYoutubeVideo({ src: src.trim() }).run();
+                if (!inserted) {
+                  setMessage("Use a youtube.com or youtu.be link.");
+                }
+              }}
+            >
+              YouTube
+            </ToolbarButton>
           </div>
           <EditorContent editor={editor} />
         </div>
+        <p className="mt-2 text-xs text-stone-500">
+          YouTube: click YouTube and paste a watch URL, or paste the URL straight into the body.
+        </p>
         <input ref={fileInput} type="file" accept="image/*" hidden onChange={handleInlineImage} />
       </div>
 
